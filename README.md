@@ -8,7 +8,6 @@ Lingua, Python (PyWebView) ve modern web teknolojileri (HTML, CSS, JS) kullanıl
 - **Akıllı Tekrar Sistemi:** Yeni eklediğiniz kelimeler "Öğreniliyor" statüsünde başlar. Quiz'de doğru bildiğiniz kelimeler 24 saat sonra tekrar edilmek üzere otomatik olarak karşınıza çıkar.
 - **🎮 Quiz (Flashcard) Modu:** Öğrenmeniz gereken kelimelere odaklanmanız için tasarlanmış özel çalışma ekranı. Kartı çevirerek kelimenin anlamını görün ve bilip bilmediğinizi işaretleyin.
 - **Canlı Arama ve Filtreleme:** Aradığınız bir kelimeyi, çeviriyi veya örnek cümleyi anında bularak filtreleyebilirsiniz.
-- **Gelişmiş Bildirimler:** Sıkıcı tarayıcı uyarıları yerine modern Toast (Açılır Baloncuk) bildirimleri ve özel silme onay pencereleri (Modal).
 - **Hızlı Düzenleme:** Önceden eklediğiniz kelimelerde değişiklik yapma ve güncelleme imkanı.
 
 ## 🛠️ Kullanılan Teknolojiler
