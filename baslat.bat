@@ -1,0 +1,3 @@
+@echo off
+echo Uygulama baslatiliyor...
+python main.py

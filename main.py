@@ -1,0 +1,88 @@
+import webview
+import json
+import os
+import datetime
+
+DB_FILE = 'words.json'
+
+class Api:
+    def __init__(self):
+        self._load_db()
+
+    def _load_db(self):
+        if not os.path.exists(DB_FILE):
+            with open(DB_FILE, 'w', encoding='utf-8') as f:
+                json.dump([], f)
+            self.words = []
+        else:
+            with open(DB_FILE, 'r', encoding='utf-8') as f:
+                self.words = json.load(f)
+
+    def _save_db(self):
+        with open(DB_FILE, 'w', encoding='utf-8') as f:
+            json.dump(self.words, f, indent=4, ensure_ascii=False)
+
+    def get_words(self):
+        now = datetime.datetime.now()
+        for word in self.words:
+            if not word.get('learned_at'):
+                word['needs_review'] = True
+                continue
+                
+            learned_time = datetime.datetime.fromisoformat(word['learned_at'])
+            # 24 hours logic
+            if now >= learned_time + datetime.timedelta(hours=24):
+                word['needs_review'] = True
+            else:
+                word['needs_review'] = False
+        return self.words
+
+    def add_word(self, english_word, translation, example_sentence):
+        new_word = {
+            'id': len(self.words) + 1 if len(self.words) == 0 else max(w['id'] for w in self.words) + 1,
+            'english': english_word,
+            'translation': translation,
+            'example': example_sentence,
+            'learned_at': None,
+            'needs_review': True
+        }
+        self.words.append(new_word)
+        self._save_db()
+        return new_word
+
+    def review_word(self, word_id):
+        for word in self.words:
+            if word['id'] == word_id:
+                word['learned_at'] = datetime.datetime.now().isoformat()
+                word['needs_review'] = False
+                break
+        self._save_db()
+        return True
+
+    def delete_word(self, word_id):
+        self.words = [w for w in self.words if w['id'] != word_id]
+        self._save_db()
+        return True
+
+    def update_word(self, word_id, english_word, translation, example_sentence):
+        for word in self.words:
+            if word['id'] == word_id:
+                word['english'] = english_word
+                word['translation'] = translation
+                word['example'] = example_sentence
+                break
+        self._save_db()
+        return True
+
+if __name__ == '__main__':
+    api = Api()
+    window = webview.create_window(
+        'Lingua - Kelime Öğrenme',
+        'index.html',
+        js_api=api,
+        width=1100,
+        height=800,
+        min_size=(800, 600),
+        background_color='#0f172a'
+    )
+    webview.start(debug=False)
