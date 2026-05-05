@@ -37,24 +37,26 @@ class Api:
     def get_words(self):
         now = datetime.datetime.now()
         for word in self.words:
+            # Ensure old words have the new field
+            if 'example_turkish' not in word:
+                word['example_turkish'] = ''
             if not word.get('learned_at'):
                 word['needs_review'] = True
                 continue
-                
             learned_time = datetime.datetime.fromisoformat(word['learned_at'])
-            # 24 hours logic
             if now >= learned_time + datetime.timedelta(hours=24):
                 word['needs_review'] = True
             else:
                 word['needs_review'] = False
         return self.words
 
-    def add_word(self, english_word, translation, example_sentence):
+    def add_word(self, english_word, translation, example_sentence, example_turkish=''):
         new_word = {
             'id': len(self.words) + 1 if len(self.words) == 0 else max(w['id'] for w in self.words) + 1,
             'english': english_word,
             'translation': translation,
             'example': example_sentence,
+            'example_turkish': example_turkish,
             'learned_at': None,
             'needs_review': True
         }
@@ -76,12 +78,13 @@ class Api:
         self._save_db()
         return True
 
-    def update_word(self, word_id, english_word, translation, example_sentence):
+    def update_word(self, word_id, english_word, translation, example_sentence, example_turkish=''):
         for word in self.words:
             if word['id'] == word_id:
                 word['english'] = english_word
                 word['translation'] = translation
                 word['example'] = example_sentence
+                word['example_turkish'] = example_turkish
                 break
         self._save_db()
         return True
@@ -92,9 +95,9 @@ if __name__ == '__main__':
         'Lingua - Kelime Öğrenme',
         INDEX_HTML,
         js_api=api,
-        width=1100,
-        height=800,
-        min_size=(800, 600),
-        background_color='#0f172a'
+        width=1200,
+        height=860,
+        min_size=(900, 650),
+        background_color='#0d0d1a'
     )
     webview.start(debug=False)
