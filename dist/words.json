@@ -1,0 +1,58 @@
+[
+    {
+        "id": 1,
+        "english": "Rarely",
+        "translation": "Nadiren",
+        "example": "I rarely see you lately",
+        "learned_at": "2026-05-05T14:07:49.326428",
+        "needs_review": false
+    },
+    {
+        "id": 2,
+        "english": "Often",
+        "translation": "Sık Sık",
+        "example": "I often walk at the weekends.",
+        "learned_at": "2026-05-05T14:07:47.839231",
+        "needs_review": false
+    },
+    {
+        "id": 3,
+        "english": "Lottery",
+        "translation": "Piyango",
+        "example": "He could win the lottery",
+        "learned_at": "2026-05-05T14:07:45.959463",
+        "needs_review": false
+    },
+    {
+        "id": 4,
+        "english": "Structure",
+        "translation": "Yapı",
+        "example": "That's why every company has a unique security approach and security team structure.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 5,
+        "english": "Approach ",
+        "translation": "Yaklaşım",
+        "example": "He has a different approach toward me",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 6,
+        "english": "Toward",
+        "translation": "–e doğru",
+        "example": "My parents taught me to be considerate toward the poor.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 7,
+        "english": "Constantly ",
+        "translation": "Sürekli",
+        "example": "Blue Team is about defensive security, meaning it constantly monitors for attacks and tries to respond to them quickly",
+        "learned_at": null,
+        "needs_review": true
+    }
+]

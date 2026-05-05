@@ -2,8 +2,20 @@ import webview
 import json
 import os
 import datetime
+import sys
 
-DB_FILE = 'words.json'
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS
+    return os.path.dirname(os.path.abspath(__file__))
+
+def get_db_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.join(os.path.dirname(sys.executable), 'words.json')
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'words.json')
+
+DB_FILE = get_db_path()
+INDEX_HTML = os.path.join(get_base_path(), 'index.html')
 
 class Api:
     def __init__(self):
@@ -78,7 +90,7 @@ if __name__ == '__main__':
     api = Api()
     window = webview.create_window(
         'Lingua - Kelime Öğrenme',
-        'index.html',
+        INDEX_HTML,
         js_api=api,
         width=1100,
         height=800,
