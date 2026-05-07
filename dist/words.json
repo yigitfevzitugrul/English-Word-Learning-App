@@ -4,24 +4,27 @@
         "english": "Rarely",
         "translation": "Nadiren",
         "example": "I rarely see you lately",
-        "learned_at": "2026-05-05T14:07:49.326428",
-        "needs_review": false
+        "learned_at": "2026-05-07T12:36:38.017525",
+        "needs_review": false,
+        "example_turkish": ""
     },
     {
         "id": 2,
         "english": "Often",
         "translation": "Sık Sık",
         "example": "I often walk at the weekends.",
-        "learned_at": "2026-05-05T14:07:47.839231",
-        "needs_review": false
+        "learned_at": "2026-05-07T12:36:36.538988",
+        "needs_review": false,
+        "example_turkish": ""
     },
     {
         "id": 3,
         "english": "Lottery",
         "translation": "Piyango",
         "example": "He could win the lottery",
-        "learned_at": "2026-05-05T14:07:45.959463",
-        "needs_review": false
+        "learned_at": "2026-05-07T12:36:34.938203",
+        "needs_review": false,
+        "example_turkish": ""
     },
     {
         "id": 4,
@@ -29,29 +32,60 @@
         "translation": "Yapı",
         "example": "That's why every company has a unique security approach and security team structure.",
         "learned_at": null,
-        "needs_review": true
+        "needs_review": true,
+        "example_turkish": ""
     },
     {
         "id": 5,
-        "english": "Approach ",
+        "english": "Approach",
         "translation": "Yaklaşım",
         "example": "He has a different approach toward me",
-        "learned_at": null,
-        "needs_review": true
+        "learned_at": "2026-05-07T12:35:59.913350",
+        "needs_review": false,
+        "example_turkish": "Bana karşı farklı bir yaklaşımı var"
     },
     {
         "id": 6,
         "english": "Toward",
         "translation": "–e doğru",
         "example": "My parents taught me to be considerate toward the poor.",
+        "learned_at": "2026-05-07T12:35:57.842710",
+        "needs_review": false,
+        "example_turkish": "Ailem bana yoksullara karşı düşünceli olmayı öğretti."
+    },
+    {
+        "id": 7,
+        "english": "Constantly",
+        "translation": "Sürekli",
+        "example": "Blue Team is about defensive security, meaning it constantly monitors for attacks and tries to respond to them quickly",
+        "learned_at": null,
+        "needs_review": true,
+        "example_turkish": "Mavi Takım, savunma amaçlı güvenlikle ilgilidir; yani saldırıları sürekli olarak izler ve bunlara hızlı bir şekilde müdahale etmeye çalışır"
+    },
+    {
+        "id": 8,
+        "english": "essential",
+        "translation": "asıl, esas",
+        "example": "The essential fact is that we have not yet sufficiently registered this.",
+        "example_turkish": "Asıl gerçek ise bunu henüz yeterince tescil ettirememiş olmamızdır.",
         "learned_at": null,
         "needs_review": true
     },
     {
-        "id": 7,
-        "english": "Constantly ",
-        "translation": "Sürekli",
-        "example": "Blue Team is about defensive security, meaning it constantly monitors for attacks and tries to respond to them quickly",
+        "id": 9,
+        "english": "provide",
+        "translation": "sağlamak, temin etmek",
+        "example": "The project goal is to provide people who are living in far areas with jobs",
+        "example_turkish": "Projenin amacı uzak bölgelerde yaşayan insanlara iş sağlamak.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 10,
+        "english": "rather",
+        "translation": "oldukça, tercih ederim ki, aksine",
+        "example": "The results are rather mixed.",
+        "example_turkish": "Sonuçlar oldukça karışık.",
         "learned_at": null,
         "needs_review": true
     }
