@@ -4,7 +4,7 @@
         "english": "Rarely",
         "translation": "Nadiren",
         "example": "I rarely see you lately",
-        "learned_at": "2026-05-07T12:36:38.017525",
+        "learned_at": "2026-05-13T21:20:18.704940",
         "needs_review": false,
         "example_turkish": ""
     },
@@ -13,7 +13,7 @@
         "english": "Often",
         "translation": "Sık Sık",
         "example": "I often walk at the weekends.",
-        "learned_at": "2026-05-07T12:36:36.538988",
+        "learned_at": "2026-05-13T21:20:17.609707",
         "needs_review": false,
         "example_turkish": ""
     },
@@ -22,7 +22,7 @@
         "english": "Lottery",
         "translation": "Piyango",
         "example": "He could win the lottery",
-        "learned_at": "2026-05-07T12:36:34.938203",
+        "learned_at": "2026-05-13T21:20:16.210281",
         "needs_review": false,
         "example_turkish": ""
     },
@@ -31,8 +31,8 @@
         "english": "Structure",
         "translation": "Yapı",
         "example": "That's why every company has a unique security approach and security team structure.",
-        "learned_at": null,
-        "needs_review": true,
+        "learned_at": "2026-05-13T21:20:13.251273",
+        "needs_review": false,
         "example_turkish": ""
     },
     {
@@ -40,7 +40,7 @@
         "english": "Approach",
         "translation": "Yaklaşım",
         "example": "He has a different approach toward me",
-        "learned_at": "2026-05-07T12:35:59.913350",
+        "learned_at": "2026-05-13T21:20:06.133872",
         "needs_review": false,
         "example_turkish": "Bana karşı farklı bir yaklaşımı var"
     },
@@ -49,7 +49,7 @@
         "english": "Toward",
         "translation": "–e doğru",
         "example": "My parents taught me to be considerate toward the poor.",
-        "learned_at": "2026-05-07T12:35:57.842710",
+        "learned_at": "2026-05-13T21:20:04.895173",
         "needs_review": false,
         "example_turkish": "Ailem bana yoksullara karşı düşünceli olmayı öğretti."
     },
@@ -58,35 +58,143 @@
         "english": "Constantly",
         "translation": "Sürekli",
         "example": "Blue Team is about defensive security, meaning it constantly monitors for attacks and tries to respond to them quickly",
-        "learned_at": null,
-        "needs_review": true,
+        "learned_at": "2026-05-13T21:20:02.720593",
+        "needs_review": false,
         "example_turkish": "Mavi Takım, savunma amaçlı güvenlikle ilgilidir; yani saldırıları sürekli olarak izler ve bunlara hızlı bir şekilde müdahale etmeye çalışır"
     },
     {
         "id": 8,
         "english": "essential",
-        "translation": "asıl, esas",
+        "translation": "Asıl, Esas",
         "example": "The essential fact is that we have not yet sufficiently registered this.",
         "example_turkish": "Asıl gerçek ise bunu henüz yeterince tescil ettirememiş olmamızdır.",
-        "learned_at": null,
-        "needs_review": true
+        "learned_at": "2026-05-13T21:19:46.774551",
+        "needs_review": false
     },
     {
         "id": 9,
         "english": "provide",
-        "translation": "sağlamak, temin etmek",
+        "translation": "Sağlamak, Temin etmek",
         "example": "The project goal is to provide people who are living in far areas with jobs",
         "example_turkish": "Projenin amacı uzak bölgelerde yaşayan insanlara iş sağlamak.",
-        "learned_at": null,
-        "needs_review": true
+        "learned_at": "2026-05-13T21:19:22.337224",
+        "needs_review": false
     },
     {
         "id": 10,
         "english": "rather",
-        "translation": "oldukça, tercih ederim ki, aksine",
+        "translation": "Oldukça, Tercih ederim ki, Aksine",
         "example": "The results are rather mixed.",
         "example_turkish": "Sonuçlar oldukça karışık.",
+        "learned_at": "2026-05-13T21:18:18.676971",
+        "needs_review": false
+    },
+    {
+        "id": 11,
+        "english": "journey",
+        "translation": "Yolculuk",
+        "example": "My journey to Afghanistan was life-changing",
+        "example_turkish": "Afganistan'a yaptığım seyahat hayatımı değiştirdi.",
+        "learned_at": "2026-05-13T21:28:05.362051",
+        "needs_review": false
+    },
+    {
+        "id": 12,
+        "english": "various",
+        "translation": "Çeşitli",
+        "example": "I would like to mention some of the various items.",
+        "example_turkish": "Çeşitli konulardan bazılarına değinmek istiyorum.",
         "learned_at": null,
         "needs_review": true
+    },
+    {
+        "id": 13,
+        "english": "efficient",
+        "translation": "Etkili, Tutumlu",
+        "example": "Both methods are more efficient than chemotherapy.",
+        "example_turkish": "Her iki yöntem de kemoterapiden daha etkilidir.",
+        "learned_at": "2026-05-13T21:17:48.377836",
+        "needs_review": false
+    },
+    {
+        "id": 14,
+        "english": "government",
+        "translation": "Hükümet, Yönetim",
+        "example": "This is where governments must take some action at last!",
+        "example_turkish": "İşte bu noktada hükümetlerin artık harekete geçmesi gerekiyor!",
+        "learned_at": "2026-05-13T21:17:40.075870",
+        "needs_review": false
+    },
+    {
+        "id": 15,
+        "english": "narrow",
+        "translation": "Sınırlı, Dar",
+        "example": "This paint comes in only a narrow range of colors.",
+        "example_turkish": "Bu boyanın yalnızca sınırlı bir renk yelpazesi mevcut.",
+        "learned_at": "2026-05-13T21:17:21.108369",
+        "needs_review": false
+    },
+    {
+        "id": 16,
+        "english": "extend, expand",
+        "translation": "Genişletmek",
+        "example": "We will extend our garage for my bike.",
+        "example_turkish": "Bisikletim için garajımızı genişleteceğiz.",
+        "learned_at": "2026-05-13T21:17:14.096323",
+        "needs_review": false
+    },
+    {
+        "id": 17,
+        "english": "architect",
+        "translation": "Mimar",
+        "example": "I will be architect.",
+        "example_turkish": "Mimar olacağım.",
+        "learned_at": "2026-05-13T21:16:48.562077",
+        "needs_review": false
+    },
+    {
+        "id": 18,
+        "english": "calendar",
+        "translation": "Takvim",
+        "example": "According to the calendar, today is May 10th.",
+        "example_turkish": "Bugün takvime göre 10 Mayıs.",
+        "learned_at": "2026-05-13T21:16:45.196141",
+        "needs_review": false
+    },
+    {
+        "id": 19,
+        "english": "Grape",
+        "translation": "Üzüm",
+        "example": "This was the best grape I have ever eaten.",
+        "example_turkish": "Bu yediğim en iyi üzümdü",
+        "learned_at": "2026-05-13T21:16:18.359344",
+        "needs_review": false
+    },
+    {
+        "id": 20,
+        "english": "Earn",
+        "translation": "Kazanmak",
+        "example": "You have to earn her respect.",
+        "example_turkish": "Onun saygısını kazanmak/hak etmek zorundasın.",
+        "learned_at": "2026-05-13T21:16:05.381190",
+        "needs_review": false
+    },
+    {
+        "id": 21,
+        "english": "Habit",
+        "translation": "Alışkanlık",
+        "example": "I gained a habit that makes me feel happy.",
+        "example_turkish": "Mutlu olmamı sağlayan bir alışkanlık edindim.",
+        "learned_at": "2026-05-13T21:15:58.160332",
+        "needs_review": false
+    },
+    {
+        "id": 22,
+        "english": "carpenter",
+        "translation": "Marangoz",
+        "example": "The carpenter cut the board crookedly.",
+        "example_turkish": "Marangoz tahtayı yamuk kesti",
+        "learned_at": "2026-05-13T21:15:56.145511",
+        "needs_review": false
     }
 ]

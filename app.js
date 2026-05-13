@@ -328,6 +328,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('quizEnglish').textContent     = word.english;
         document.getElementById('quizTranslation').textContent = word.translation;
         document.getElementById('quizExample').textContent     = `"${word.example}"`;
+        const trEl = document.getElementById('quizExampleTurkish');
+        if (word.example_turkish && word.example_turkish.trim()) {
+            trEl.textContent    = `"${word.example_turkish}"`;
+            trEl.style.display  = 'block';
+        } else {
+            trEl.textContent    = '';
+            trEl.style.display  = 'none';
+        }
         quizHiddenPart.style.display = 'none';
         quizActions.style.display    = 'none';
         quizHint.style.display       = 'block';

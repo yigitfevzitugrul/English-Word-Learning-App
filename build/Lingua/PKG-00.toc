@@ -62,9 +62,21 @@
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\main.py',
    'PYSOURCE'),
+  ('webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
+   'BINARY'),
   ('webview\\lib\\WebBrowserInterop.x64.dll',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\WebBrowserInterop.x64.dll',
+   'BINARY'),
+  ('webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
+   'BINARY'),
+  ('webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
    'BINARY'),
   ('webview\\lib\\runtimes\\win-x86\\native\\WebView2Loader.dll',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
@@ -74,21 +86,9 @@
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\WebBrowserInterop.x86.dll',
    'BINARY'),
-  ('webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-x64\\native\\WebView2Loader.dll',
-   'BINARY'),
   ('webview\\lib\\Microsoft.Web.WebView2.Core.dll',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\Microsoft.Web.WebView2.Core.dll',
-   'BINARY'),
-  ('webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\Microsoft.Web.WebView2.WinForms.dll',
-   'BINARY'),
-  ('webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\runtimes\\win-arm64\\native\\WebView2Loader.dll',
    'BINARY'),
   ('python312.dll',
    'C:\\Users\\yigit\\AppData\\Local\\Programs\\Python\\Python312\\python312.dll',
@@ -214,6 +214,14 @@
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\style.css',
    'DATA'),
+  ('webview\\js\\lib\\polyfill.js',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\lib\\polyfill.js',
+   'DATA'),
+  ('webview\\js\\api.js',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\api.js',
+   'DATA'),
   ('webview\\js\\finish.js',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\finish.js',
@@ -222,90 +230,90 @@
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\customize.js',
    'DATA'),
+  ('webview\\js\\lib\\dom_json.js',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\lib\\dom_json.js',
+   'DATA'),
   ('webview\\js\\state.js',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\state.js',
-   'DATA'),
-  ('webview\\js\\api.js',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\api.js',
    'DATA'),
   ('webview\\lib\\pywebview-android.jar',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\lib\\pywebview-android.jar',
    'DATA'),
-  ('webview\\js\\lib\\polyfill.js',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\lib\\polyfill.js',
-   'DATA'),
-  ('webview\\js\\lib\\dom_json.js',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\webview\\js\\lib\\dom_json.js',
-   'DATA'),
   ('cryptography-44.0.0.dist-info\\INSTALLER',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\INSTALLER',
-   'DATA'),
-  ('cryptography-44.0.0.dist-info\\licenses\\LICENSE.BSD',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\licenses\\LICENSE.BSD',
-   'DATA'),
-  ('cryptography-44.0.0.dist-info\\REQUESTED',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\REQUESTED',
    'DATA'),
   ('cryptography-44.0.0.dist-info\\WHEEL',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\WHEEL',
    'DATA'),
-  ('cryptography-44.0.0.dist-info\\licenses\\LICENSE',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\licenses\\LICENSE',
-   'DATA'),
   ('cryptography-44.0.0.dist-info\\METADATA',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\METADATA',
    'DATA'),
-  ('cryptography-44.0.0.dist-info\\licenses\\LICENSE.APACHE',
+  ('cryptography-44.0.0.dist-info\\REQUESTED',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\licenses\\LICENSE.APACHE',
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\REQUESTED',
    'DATA'),
   ('cryptography-44.0.0.dist-info\\RECORD',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\RECORD',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+  ('cryptography-44.0.0.dist-info\\licenses\\LICENSE.APACHE',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\licenses\\LICENSE.APACHE',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
+  ('cryptography-44.0.0.dist-info\\licenses\\LICENSE.BSD',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\licenses\\LICENSE.BSD',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
+  ('cryptography-44.0.0.dist-info\\licenses\\LICENSE',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
-   'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
-   'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\METADATA',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\METADATA',
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\cryptography-44.0.0.dist-info\\licenses\\LICENSE',
    'DATA'),
   ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
    'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
+   'DATA'),
   ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\INSTALLER',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\METADATA',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\METADATA',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
    'DATA'),
   ('setuptools\\_vendor\\jaraco\\text\\Lorem ipsum.txt',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\setuptools\\_vendor\\jaraco\\text\\Lorem '
    'ipsum.txt',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\WHEEL',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\WHEEL',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\RECORD',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\RECORD',
    'DATA'),
   ('markupsafe-3.0.3.dist-info\\top_level.txt',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
@@ -319,21 +327,13 @@
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\METADATA',
    'DATA'),
-  ('markupsafe-3.0.3.dist-info\\REQUESTED',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\REQUESTED',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\RECORD',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\RECORD',
-   'DATA'),
-  ('markupsafe-3.0.3.dist-info\\WHEEL',
-   'C:\\Users\\yigit\\Desktop\\Gerekli '
-   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\WHEEL',
-   'DATA'),
   ('markupsafe-3.0.3.dist-info\\licenses\\LICENSE.txt',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
    'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\licenses\\LICENSE.txt',
+   'DATA'),
+  ('markupsafe-3.0.3.dist-info\\REQUESTED',
+   'C:\\Users\\yigit\\Desktop\\Gerekli '
+   'Dosyalar\\Projelerim\\DilOgrenmeUygulaması\\venv\\Lib\\site-packages\\markupsafe-3.0.3.dist-info\\REQUESTED',
    'DATA'),
   ('base_library.zip',
    'C:\\Users\\yigit\\Desktop\\Gerekli '
