@@ -265,6 +265,12 @@ body {
     border-color: rgba(247,92,92,0.2);
 }
 
+.pill.success {
+    color: var(--yellow);
+    background: var(--yellow-dim);
+    border-color: rgba(247,184,79,0.2);
+}
+
 .btn-quiz {
     display: inline-flex;
     align-items: center;
@@ -406,6 +412,16 @@ body {
     border-color: rgba(247,92,92,0.45);
 }
 
+.word-card.permanently-learned {
+    border-color: rgba(247,184,79,0.3);
+    background: linear-gradient(135deg, var(--surface) 80%, rgba(247,184,79,0.06));
+}
+
+.word-card.permanently-learned:hover {
+    border-color: rgba(247,184,79,0.5);
+    box-shadow: 0 4px 20px rgba(247,184,79,0.1);
+}
+
 /* Card header row */
 .card-head {
     display: flex;
@@ -425,9 +441,15 @@ body {
     white-space: nowrap;
 }
 
-.badge-learned  { background: var(--green-dim);  color: var(--green);  }
-.badge-review   { background: var(--red-dim);    color: var(--red);    }
-.badge-learning { background: var(--yellow-dim); color: var(--yellow); }
+.badge-learned   { background: var(--green-dim);  color: var(--green);  }
+.badge-review    { background: var(--red-dim);    color: var(--red);    }
+.badge-learning  { background: var(--yellow-dim); color: var(--yellow); }
+.badge-permanent {
+    background: rgba(247,184,79,0.15);
+    color: var(--yellow);
+    border: 1px solid rgba(247,184,79,0.3);
+    gap: 5px;
+}
 
 .card-actions {
     display: flex;
@@ -540,9 +562,11 @@ body {
 .card-foot {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding-top: 10px;
     border-top: 1px solid var(--border);
     margin-top: 2px;
+    gap: 8px;
 }
 
 .date-info {
@@ -551,6 +575,28 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
+    margin-left: auto;
+}
+
+/* Progress dots on word cards */
+.card-quiz-dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background var(--transition), transform var(--transition);
+}
+
+.dot.filled {
+    background: var(--accent);
+    transform: scale(1.15);
 }
 
 /* ── EMPTY STATE ── */
@@ -778,9 +824,11 @@ body {
 }
 
 .toast.error { border-left-color: var(--red); }
+.toast.gold  { border-left-color: var(--yellow); }
 .toast i { font-size: 13px; }
-.toast:not(.error) i { color: var(--green); }
+.toast:not(.error):not(.gold) i { color: var(--green); }
 .toast.error i { color: var(--red); }
+.toast.gold  i { color: var(--yellow); }
 
 @keyframes toastIn  { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
@@ -857,6 +905,63 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* ── QUIZ DAY INFO BANNER ── */
+.quiz-day-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(79,142,247,0.08);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    gap: 12px;
+}
+
+.quiz-day-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.quiz-group-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+
+/* ── QUIZ CORRECT DOTS ── */
+.quiz-correct-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    margin: 2px 0;
+}
+
+.quiz-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1.5px solid var(--border);
+    transition: all 0.25s ease;
+}
+
+.quiz-dot.filled {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 6px var(--accent-glow);
+    transform: scale(1.2);
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 860px) {

@@ -90,11 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('wordsGrid');
         grid.innerHTML = '';
 
-        document.getElementById('totalCount').textContent  = allWords.length;
-        document.getElementById('reviewCount').textContent = allWords.filter(w => w.needs_review).length;
+        document.getElementById('totalCount').textContent   = allWords.length;
+        document.getElementById('reviewCount').textContent  = allWords.filter(w => w.needs_review).length;
+        document.getElementById('learnedCount').textContent = allWords.filter(w => w.permanently_learned).length;
 
         let words = allWords;
-        if (currentFilter === 'review') words = words.filter(w => w.needs_review);
+        if (currentFilter === 'review')  words = words.filter(w => w.needs_review);
+        if (currentFilter === 'learned') words = words.filter(w => w.permanently_learned);
         if (searchQuery) {
             words = words.filter(w =>
                 w.english.toLowerCase().includes(searchQuery) ||
@@ -105,24 +107,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (words.length === 0) {
-            const icon = currentFilter === 'review' ? 'fa-check-circle' : (searchQuery ? 'fa-search' : 'fa-book-open');
-            const msg  = searchQuery
+            const icon = currentFilter === 'review'
+                ? 'fa-check-circle'
+                : currentFilter === 'learned'
+                    ? 'fa-trophy'
+                    : (searchQuery ? 'fa-search' : 'fa-book-open');
+            const msg = searchQuery
                 ? 'Aramanıza uygun kelime bulunamadı.'
-                : (currentFilter === 'review' ? 'Tekrar edilecek kelime yok.' : 'Henüz kelime eklemediniz.');
+                : currentFilter === 'review'
+                    ? 'Tekrar edilecek kelime yok.'
+                    : currentFilter === 'learned'
+                        ? 'Henüz kalıcı öğrenilen kelime yok.'
+                        : 'Henüz kelime eklemediniz.';
             grid.innerHTML = `<div class="empty-state"><i class="fas ${icon}"></i><p>${msg}</p></div>`;
             return;
         }
 
         words.forEach(word => {
             const card = document.createElement('div');
-            card.className = `word-card${word.needs_review ? ' needs-review' : ''}`;
+            const isPermanent = word.permanently_learned;
+            card.className = `word-card${word.needs_review ? ' needs-review' : ''}${isPermanent ? ' permanently-learned' : ''}`;
 
             // Badge
-            let badge = '<span class="badge badge-learned">Öğrenildi</span>';
-            if (word.needs_review) {
+            let badge;
+            if (isPermanent) {
+                badge = '<span class="badge badge-permanent"><i class="fas fa-trophy"></i> Kalıcı Öğrenildi</span>';
+            } else if (word.needs_review) {
                 badge = word.learned_at
                     ? '<span class="badge badge-review">Tekrar Vakti</span>'
                     : '<span class="badge badge-learning">Yeni</span>';
+            } else {
+                badge = '<span class="badge badge-learned">Öğrenildi</span>';
+            }
+
+            // Quiz progress dots for non-permanent words
+            const count = word.quiz_correct_count || 0;
+            let dotsHtml = '';
+            if (!isPermanent) {
+                const dots = Array.from({ length: 4 }, (_, i) =>
+                    `<span class="dot ${i < count ? 'filled' : ''}"></span>`
+                ).join('');
+                dotsHtml = `<div class="card-quiz-dots" title="${count}/4 doğru">${dots}</div>`;
             }
 
             // Date
@@ -143,8 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="tr-text" style="display:none;"></div>
                 </div>` : '';
 
-            // Review button
-            const reviewBtn = word.needs_review
+            // Review button (only if not permanently learned)
+            const reviewBtn = (word.needs_review && !isPermanent)
                 ? `<button class="icon-btn btn-review" onclick="reviewWord(${word.id})" title="Öğrendim"><i class="fas fa-check"></i></button>`
                 : '';
 
@@ -164,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="word-example">"${escapeHtml(word.example)}"</div>
                 ${trSection}
                 <div class="card-foot">
+                    ${dotsHtml}
                     <span class="date-info"><i class="far fa-clock"></i> ${dateStr}</span>
                 </div>`;
 
@@ -251,13 +277,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showToast = function (message, type = 'success') {
         const container = document.getElementById('toastContainer');
         const toast     = document.createElement('div');
-        toast.className = `toast${type === 'error' ? ' error' : ''}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${escapeHtml(message)}`;
+        toast.className = `toast${type === 'error' ? ' error' : type === 'gold' ? ' gold' : ''}`;
+        const icon = type === 'error' ? 'fa-exclamation-circle'
+                   : type === 'gold'  ? 'fa-trophy'
+                   : 'fa-check-circle';
+        toast.innerHTML = `<i class="fas ${icon}"></i> ${escapeHtml(message)}`;
         container.appendChild(toast);
         setTimeout(() => {
             toast.style.animation = 'toastOut 0.2s ease forwards';
             setTimeout(() => toast.remove(), 200);
-        }, 3000);
+        }, 3500);
     };
 
     // ── HELPERS ──────────────────────────────────────────────────
@@ -303,16 +332,46 @@ document.addEventListener('DOMContentLoaded', () => {
         loadWords();
     });
 
-    function startQuiz() {
-        quizWords        = allWords.filter(w => w.needs_review);
-        currentQuizIndex = 0;
-        if (quizWords.length === 0) {
-            quizContent.style.display = 'none';
-            quizEmpty.style.display   = 'flex';
-        } else {
-            quizContent.style.display = 'flex';
-            quizEmpty.style.display   = 'none';
-            showQuizCard();
+    async function startQuiz() {
+        try {
+            // Load today's group info for the banner
+            const info = await pywebview.api.get_quiz_info();
+            document.getElementById('quizDayName').textContent   = info.day_name;
+            document.getElementById('quizGroupNum').textContent  = info.group_number;
+            document.getElementById('quizGroupCount').textContent = `${info.remaining} kelime`;
+
+            // Load today's quiz words
+            quizWords        = await pywebview.api.get_quiz_words();
+            currentQuizIndex = 0;
+
+            if (quizWords.length === 0) {
+                quizContent.style.display = 'none';
+                quizEmpty.style.display   = 'flex';
+                const emptyMsg = document.getElementById('quizEmptyMsg');
+                if (info.words_in_group === 0) {
+                    emptyMsg.textContent = 'Bu gruba henüz kelime atanmadı.';
+                } else {
+                    emptyMsg.textContent = `Bugünkü ${info.group_number}. grup kelimelerini tamamladınız! 🎉`;
+                }
+            } else {
+                quizContent.style.display = 'flex';
+                quizEmpty.style.display   = 'none';
+                showQuizCard();
+            }
+        } catch (err) {
+            console.error(err);
+            showToast('Quiz yüklenirken hata oluştu!', 'error');
+        }
+    }
+
+    function renderCorrectDots(count) {
+        const container = document.getElementById('quizCorrectDots');
+        container.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+            const dot = document.createElement('span');
+            dot.className = `quiz-dot${i < count ? ' filled' : ''}`;
+            dot.title = `${count}/4 doğru`;
+            container.appendChild(dot);
         }
     }
 
@@ -320,7 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentQuizIndex >= quizWords.length) {
             quizContent.style.display = 'none';
             quizEmpty.style.display   = 'flex';
-            showToast('Tüm quiz kelimelerini tamamladınız!');
+            document.getElementById('quizEmptyMsg').textContent = 'Bugünkü tüm kelimeleri tamamladınız! 🎉';
+            showToast('Bugünkü quiz tamamlandı!');
             return;
         }
         const word = quizWords[currentQuizIndex];
@@ -328,14 +388,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('quizEnglish').textContent     = word.english;
         document.getElementById('quizTranslation').textContent = word.translation;
         document.getElementById('quizExample').textContent     = `"${word.example}"`;
+
         const trEl = document.getElementById('quizExampleTurkish');
         if (word.example_turkish && word.example_turkish.trim()) {
-            trEl.textContent    = `"${word.example_turkish}"`;
-            trEl.style.display  = 'block';
+            trEl.textContent   = `"${word.example_turkish}"`;
+            trEl.style.display = 'block';
         } else {
-            trEl.textContent    = '';
-            trEl.style.display  = 'none';
+            trEl.textContent   = '';
+            trEl.style.display = 'none';
         }
+
+        renderCorrectDots(word.quiz_correct_count || 0);
+
         quizHiddenPart.style.display = 'none';
         quizActions.style.display    = 'none';
         quizHint.style.display       = 'block';
@@ -350,13 +414,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.handleQuizAnswer = async function (knewIt) {
-        if (knewIt) {
-            try {
-                await pywebview.api.review_word(quizWords[currentQuizIndex].id);
-                showToast(`"${quizWords[currentQuizIndex].english}" öğrenildi olarak işaretlendi.`);
-            } catch (err) {
-                console.error(err);
+        const word = quizWords[currentQuizIndex];
+        try {
+            const result = await pywebview.api.record_quiz_answer(word.id, knewIt);
+
+            if (result.permanently_learned) {
+                showToast(`🏆 "${word.english}" kalıcı olarak öğrenildi!`, 'gold');
+            } else if (knewIt) {
+                const remaining = 4 - result.quiz_correct_count;
+                if (remaining > 0) {
+                    showToast(`"${word.english}" – ${result.quiz_correct_count}/4 doğru. ${remaining} kez daha!`);
+                }
             }
+        } catch (err) {
+            console.error(err);
         }
         currentQuizIndex++;
         showQuizCard();

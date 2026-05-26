@@ -4,8 +4,8 @@
         "english": "Rarely",
         "translation": "Nadiren",
         "example": "I rarely see you lately",
-        "learned_at": "2026-05-13T21:20:18.704940",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:09:07.547366",
+        "needs_review": true,
         "example_turkish": ""
     },
     {
@@ -13,8 +13,8 @@
         "english": "Often",
         "translation": "Sık Sık",
         "example": "I often walk at the weekends.",
-        "learned_at": "2026-05-13T21:20:17.609707",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:09:06.535908",
+        "needs_review": true,
         "example_turkish": ""
     },
     {
@@ -22,8 +22,8 @@
         "english": "Lottery",
         "translation": "Piyango",
         "example": "He could win the lottery",
-        "learned_at": "2026-05-13T21:20:16.210281",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:09:05.201717",
+        "needs_review": true,
         "example_turkish": ""
     },
     {
@@ -31,8 +31,8 @@
         "english": "Structure",
         "translation": "Yapı",
         "example": "That's why every company has a unique security approach and security team structure.",
-        "learned_at": "2026-05-13T21:20:13.251273",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:09:03.253942",
+        "needs_review": true,
         "example_turkish": ""
     },
     {
@@ -40,8 +40,8 @@
         "english": "Approach",
         "translation": "Yaklaşım",
         "example": "He has a different approach toward me",
-        "learned_at": "2026-05-13T21:20:06.133872",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:08:41.388866",
+        "needs_review": true,
         "example_turkish": "Bana karşı farklı bir yaklaşımı var"
     },
     {
@@ -49,8 +49,8 @@
         "english": "Toward",
         "translation": "–e doğru",
         "example": "My parents taught me to be considerate toward the poor.",
-        "learned_at": "2026-05-13T21:20:04.895173",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:08:30.541232",
+        "needs_review": true,
         "example_turkish": "Ailem bana yoksullara karşı düşünceli olmayı öğretti."
     },
     {
@@ -58,8 +58,8 @@
         "english": "Constantly",
         "translation": "Sürekli",
         "example": "Blue Team is about defensive security, meaning it constantly monitors for attacks and tries to respond to them quickly",
-        "learned_at": "2026-05-13T21:20:02.720593",
-        "needs_review": false,
+        "learned_at": "2026-05-20T10:07:47.513399",
+        "needs_review": true,
         "example_turkish": "Mavi Takım, savunma amaçlı güvenlikle ilgilidir; yani saldırıları sürekli olarak izler ve bunlara hızlı bir şekilde müdahale etmeye çalışır"
     },
     {
@@ -69,7 +69,7 @@
         "example": "The essential fact is that we have not yet sufficiently registered this.",
         "example_turkish": "Asıl gerçek ise bunu henüz yeterince tescil ettirememiş olmamızdır.",
         "learned_at": "2026-05-13T21:19:46.774551",
-        "needs_review": false
+        "needs_review": true
     },
     {
         "id": 9,
@@ -77,8 +77,8 @@
         "translation": "Sağlamak, Temin etmek",
         "example": "The project goal is to provide people who are living in far areas with jobs",
         "example_turkish": "Projenin amacı uzak bölgelerde yaşayan insanlara iş sağlamak.",
-        "learned_at": "2026-05-13T21:19:22.337224",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:06:49.169644",
+        "needs_review": true
     },
     {
         "id": 10,
@@ -87,7 +87,7 @@
         "example": "The results are rather mixed.",
         "example_turkish": "Sonuçlar oldukça karışık.",
         "learned_at": "2026-05-13T21:18:18.676971",
-        "needs_review": false
+        "needs_review": true
     },
     {
         "id": 11,
@@ -96,7 +96,7 @@
         "example": "My journey to Afghanistan was life-changing",
         "example_turkish": "Afganistan'a yaptığım seyahat hayatımı değiştirdi.",
         "learned_at": "2026-05-13T21:28:05.362051",
-        "needs_review": false
+        "needs_review": true
     },
     {
         "id": 12,
@@ -113,8 +113,8 @@
         "translation": "Etkili, Tutumlu",
         "example": "Both methods are more efficient than chemotherapy.",
         "example_turkish": "Her iki yöntem de kemoterapiden daha etkilidir.",
-        "learned_at": "2026-05-13T21:17:48.377836",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:04:35.404458",
+        "needs_review": true
     },
     {
         "id": 14,
@@ -122,8 +122,8 @@
         "translation": "Hükümet, Yönetim",
         "example": "This is where governments must take some action at last!",
         "example_turkish": "İşte bu noktada hükümetlerin artık harekete geçmesi gerekiyor!",
-        "learned_at": "2026-05-13T21:17:40.075870",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:04:19.461318",
+        "needs_review": true
     },
     {
         "id": 15,
@@ -131,8 +131,8 @@
         "translation": "Sınırlı, Dar",
         "example": "This paint comes in only a narrow range of colors.",
         "example_turkish": "Bu boyanın yalnızca sınırlı bir renk yelpazesi mevcut.",
-        "learned_at": "2026-05-13T21:17:21.108369",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:03:54.685623",
+        "needs_review": true
     },
     {
         "id": 16,
@@ -140,8 +140,8 @@
         "translation": "Genişletmek",
         "example": "We will extend our garage for my bike.",
         "example_turkish": "Bisikletim için garajımızı genişleteceğiz.",
-        "learned_at": "2026-05-13T21:17:14.096323",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:03:44.658933",
+        "needs_review": true
     },
     {
         "id": 17,
@@ -149,8 +149,8 @@
         "translation": "Mimar",
         "example": "I will be architect.",
         "example_turkish": "Mimar olacağım.",
-        "learned_at": "2026-05-13T21:16:48.562077",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:03:31.868492",
+        "needs_review": true
     },
     {
         "id": 18,
@@ -158,8 +158,8 @@
         "translation": "Takvim",
         "example": "According to the calendar, today is May 10th.",
         "example_turkish": "Bugün takvime göre 10 Mayıs.",
-        "learned_at": "2026-05-13T21:16:45.196141",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:03:27.679016",
+        "needs_review": true
     },
     {
         "id": 19,
@@ -167,8 +167,8 @@
         "translation": "Üzüm",
         "example": "This was the best grape I have ever eaten.",
         "example_turkish": "Bu yediğim en iyi üzümdü",
-        "learned_at": "2026-05-13T21:16:18.359344",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:02:52.547323",
+        "needs_review": true
     },
     {
         "id": 20,
@@ -176,8 +176,8 @@
         "translation": "Kazanmak",
         "example": "You have to earn her respect.",
         "example_turkish": "Onun saygısını kazanmak/hak etmek zorundasın.",
-        "learned_at": "2026-05-13T21:16:05.381190",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:02:47.372159",
+        "needs_review": true
     },
     {
         "id": 21,
@@ -185,8 +185,8 @@
         "translation": "Alışkanlık",
         "example": "I gained a habit that makes me feel happy.",
         "example_turkish": "Mutlu olmamı sağlayan bir alışkanlık edindim.",
-        "learned_at": "2026-05-13T21:15:58.160332",
-        "needs_review": false
+        "learned_at": "2026-05-20T10:02:30.078488",
+        "needs_review": true
     },
     {
         "id": 22,
@@ -194,7 +194,106 @@
         "translation": "Marangoz",
         "example": "The carpenter cut the board crookedly.",
         "example_turkish": "Marangoz tahtayı yamuk kesti",
-        "learned_at": "2026-05-13T21:15:56.145511",
+        "learned_at": "2026-05-26T15:49:16.510912",
+        "needs_review": false
+    },
+    {
+        "id": 23,
+        "english": "lend",
+        "translation": "ödünç vermek",
+        "example": "I lend a toy to my best friend",
+        "example_turkish": "En iyi arkadaşıma bir oyuncak ödünç veririm.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 24,
+        "english": "enroll",
+        "translation": "kaydolmak",
+        "example": "She enrolled in a history course.",
+        "example_turkish": "o tarih kursuna kaydoldu.",
+        "learned_at": "2026-05-26T15:48:57.582662",
+        "needs_review": false
+    },
+    {
+        "id": 25,
+        "english": "railway",
+        "translation": "trenyolu",
+        "example": "The crashed truck was blocking the railway.",
+        "example_turkish": "Kaza yapan kamyon demiryolunu kapatıyordu.",
+        "learned_at": "2026-05-26T15:48:54.001357",
+        "needs_review": false
+    },
+    {
+        "id": 26,
+        "english": "refrigerator",
+        "translation": "buzdolabı",
+        "example": "My parents can't afford a new refrigerator.",
+        "example_turkish": "Ailemin yeni bir buzdolabı alacak parası yok.",
+        "learned_at": "2026-05-26T15:48:37.183930",
+        "needs_review": false
+    },
+    {
+        "id": 27,
+        "english": "repair",
+        "translation": "tamir etmek",
+        "example": "The repairs to the kitchen will be expensive.",
+        "example_turkish": "Mutfağın onarımı pahalıya mal olacak.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 28,
+        "english": "polite",
+        "translation": "kibar",
+        "example": "Japanese people in general are polite.",
+        "example_turkish": "Japonlar genellikle kibarlardır.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 29,
+        "english": "restroom",
+        "translation": "tuvalet",
+        "example": "Where's the nearest restroom?",
+        "example_turkish": "En yakın tuvalet nerededir ?",
+        "learned_at": "2026-05-26T15:47:31.956377",
+        "needs_review": false
+    },
+    {
+        "id": 30,
+        "english": "rise",
+        "translation": "güneş (doğmak)",
+        "example": "A new sun, the daughter of the previous one, will rise in the sky.",
+        "example_turkish": "Bir öncekinin kızı olan yeni bir güneş gökyüzünde doğacak.",
+        "learned_at": "2026-05-26T15:47:28.997635",
+        "needs_review": false
+    },
+    {
+        "id": 31,
+        "english": "river",
+        "translation": "ırmak",
+        "example": "The locals use canoes to pass the river.",
+        "example_turkish": "Bölge halkı nehri geçmek için kano kullanıyor.",
+        "learned_at": "2026-05-26T15:47:26.398440",
+        "needs_review": false
+    },
+    {
+        "id": 32,
+        "english": "roof",
+        "translation": "çatı",
+        "example": "The wind triumphed over electricity pylons, roofs, traffic signs and, ultimately over the forest.",
+        "example_turkish": "Rüzgar elektrik direklerine, çatılara, trafik işaretlerine ve nihayetinde ormana galip geldi.",
+        "learned_at": null,
+        "needs_review": true
+    },
+    {
+        "id": 33,
+        "english": "shelf",
+        "translation": "raf",
+        "example": "Can you put these books on the top shelf?",
+        "example_turkish": "Bu kitapları en üst rafa koyabilir misin?",
+        "learned_at": "2026-05-26T15:47:04.095027",
         "needs_review": false
     }
 ]
