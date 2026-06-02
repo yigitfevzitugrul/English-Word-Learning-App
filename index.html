@@ -34,7 +34,13 @@
 
                 <div class="field">
                     <label for="translation">Türkçe Çeviri</label>
-                    <input type="text" id="translation" placeholder="Örn: Tesadüfen bulunan mutluluk" required>
+                    <div class="input-with-action">
+                        <input type="text" id="translation" placeholder="Örn: Tesadüfen bulunan mutluluk" required>
+                        <button type="button" class="btn-translate" id="autoTranslateBtn" title="Otomatik çevir">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
+                    <div class="translate-suggestion" id="translateSuggestion" style="display:none;"></div>
                 </div>
 
                 <div class="field">
@@ -49,6 +55,16 @@
                     </label>
                     <textarea id="exampleTurkish" placeholder="Bu kafeyi bulmak tam bir tesadüftü."></textarea>
                 </div>
+
+
+
+                <div class="field">
+                    <label for="wordNotes">
+                        Not
+                        <span class="optional-label">isteğe bağlı</span>
+                    </label>
+                    <textarea id="wordNotes" placeholder="Kelime hakkında not..."></textarea>
+                </div>
             </div>
 
             <div class="form-btns" style="margin-top: 16px;">
@@ -60,6 +76,20 @@
                 </button>
             </div>
         </form>
+
+        <div class="sidebar-spacer"></div>
+
+        <!-- Sidebar nav buttons -->
+        <div class="sidebar-nav-group">
+            <button class="sidebar-nav-btn" id="openStatsBtn">
+                <i class="fas fa-chart-bar"></i>
+                <span>İstatistikler</span>
+            </button>
+            <button class="sidebar-nav-btn" id="openSettingsBtn">
+                <i class="fas fa-sliders-h"></i>
+                <span>Ayarlar</span>
+            </button>
+        </div>
     </aside>
 
     <!-- ── MAIN ── -->
@@ -81,11 +111,37 @@
                         <i class="fas fa-trophy"></i>
                         <span id="learnedCount">0</span> kalıcı
                     </span>
+                    <span class="pill streak" id="streakPill" title="Günlük seri">
+                        <i class="fas fa-fire-flame-curved"></i>
+                        <span id="streakCount">0</span> gün
+                    </span>
                 </div>
             </div>
-            <button id="toggleQuizBtn" class="btn-quiz">
-                <i class="fas fa-gamepad"></i> Quiz
-            </button>
+            <div class="topbar-right">
+                <!-- Sort dropdown -->
+                <div class="sort-wrap">
+                    <button class="btn-icon-topbar" id="sortBtn" title="Sırala">
+                        <i class="fas fa-sort"></i>
+                    </button>
+                    <div class="sort-dropdown" id="sortDropdown">
+                        <div class="sort-option active" data-sort="default"><i class="fas fa-clock"></i> Varsayılan</div>
+                        <div class="sort-option" data-sort="alpha"><i class="fas fa-font"></i> A → Z</div>
+                        <div class="sort-option" data-sort="alpha-desc"><i class="fas fa-font"></i> Z → A</div>
+                        <div class="sort-option" data-sort="wrong"><i class="fas fa-times-circle"></i> En Çok Yanlış</div>
+                        <div class="sort-option" data-sort="correct"><i class="fas fa-check-circle"></i> En Çok Doğru</div>
+                    </div>
+                </div>
+                <!-- View toggle -->
+                <button class="btn-icon-topbar active" id="viewGridBtn" title="Grid görünüm">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="btn-icon-topbar" id="viewListBtn" title="Liste görünüm">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button id="toggleQuizBtn" class="btn-quiz">
+                    <i class="fas fa-gamepad"></i> Quiz
+                </button>
+            </div>
         </div>
 
         <!-- Main content -->
@@ -113,11 +169,19 @@
             </div>
         </div>
 
-        <!-- Quiz panel -->
+        <!-- ── QUIZ PANEL ── -->
         <div id="quizSection" class="quiz-panel" style="display:none;">
             <div id="quizContent" class="quiz-inner">
                 <div class="quiz-top">
                     <h2>Quiz Modu</h2>
+                    <div class="quiz-mode-toggle">
+                        <button class="quiz-mode-btn active" id="quizModeClassic" onclick="setQuizMode('classic')">
+                            <i class="fas fa-hand-point-up"></i> Klasik
+                        </button>
+                        <button class="quiz-mode-btn" id="quizModeMulti" onclick="setQuizMode('multi')">
+                            <i class="fas fa-list-ol"></i> Çoktan Seçmeli
+                        </button>
+                    </div>
                     <span id="quizProgress" class="quiz-prog"></span>
                 </div>
 
@@ -131,11 +195,11 @@
                     <span id="quizGroupCount" class="quiz-group-badge">0 kelime</span>
                 </div>
 
+                <!-- Classic quiz card -->
                 <div id="quizCard" class="quiz-card">
                     <span class="quiz-label">Kelime</span>
                     <h3 id="quizEnglish" class="quiz-word">—</h3>
 
-                    <!-- Progress dots (4 circles = 4 correct to permanently learn) -->
                     <div id="quizCorrectDots" class="quiz-correct-dots"></div>
 
                     <div id="quizHiddenPart" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
@@ -146,6 +210,14 @@
                     <p id="quizHint" class="quiz-hint">
                         <i class="fas fa-hand-pointer"></i> Çeviriyi görmek için tıkla
                     </p>
+                </div>
+
+                <!-- Multiple-choice quiz card -->
+                <div id="quizMultiCard" class="quiz-card" style="display:none;">
+                    <span class="quiz-label">Bu kelimenin Türkçe anlamı nedir?</span>
+                    <h3 id="quizMultiEnglish" class="quiz-word">—</h3>
+                    <div id="quizMultiCorrectDots" class="quiz-correct-dots"></div>
+                    <div id="quizMultiChoices" class="quiz-choices"></div>
                 </div>
 
                 <div id="quizActions" class="quiz-actions" style="display:none;">
@@ -168,6 +240,150 @@
                 <i class="fas fa-arrow-left"></i> Listeye Dön
             </button>
         </div>
+
+        <!-- ── STATISTICS PAGE ── -->
+        <div id="statsPage" style="display:none; flex:1; flex-direction:column;">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="btn-back" id="closeStatsBtn"><i class="fas fa-arrow-left"></i></button>
+                    <span class="page-title">İstatistikler</span>
+                </div>
+            </div>
+            <div class="stats-page-content">
+                <!-- Summary cards -->
+                <div class="stats-summary-grid">
+                    <div class="stats-summary-card">
+                        <div class="stats-summary-icon" style="background:rgba(79,142,247,0.15);color:var(--accent);">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stats-summary-val" id="statTotal">0</div>
+                        <div class="stats-summary-label">Toplam Kelime</div>
+                    </div>
+                    <div class="stats-summary-card">
+                        <div class="stats-summary-icon" style="background:rgba(62,207,142,0.15);color:var(--green);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stats-summary-val" id="statLearned">0</div>
+                        <div class="stats-summary-label">Öğrenilen</div>
+                    </div>
+                    <div class="stats-summary-card">
+                        <div class="stats-summary-icon" style="background:rgba(247,184,79,0.15);color:var(--yellow);">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stats-summary-val" id="statPermanent">0</div>
+                        <div class="stats-summary-label">Kalıcı</div>
+                    </div>
+                    <div class="stats-summary-card">
+                        <div class="stats-summary-icon" style="background:rgba(247,92,92,0.15);color:var(--red);">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stats-summary-val" id="statReview">0</div>
+                        <div class="stats-summary-label">Tekrar Bekleyen</div>
+                    </div>
+                    <div class="stats-summary-card">
+                        <div class="stats-summary-icon" style="background:rgba(247,92,92,0.15);color:var(--red);">
+                            <i class="fas fa-fire-flame-curved"></i>
+                        </div>
+                        <div class="stats-summary-val" id="statStreak">0</div>
+                        <div class="stats-summary-label">Günlük Seri</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid-2">
+                    <!-- Daily bar chart -->
+                    <div class="stats-card">
+                        <div class="stats-card-title"><i class="fas fa-calendar-week"></i> Son 7 Gün</div>
+                        <div class="stats-bar-chart" id="statsBarChart"></div>
+                    </div>
+
+                    <!-- Most wrong words -->
+                    <div class="stats-card">
+                        <div class="stats-card-title"><i class="fas fa-times-circle"></i> En Çok Yanlış Yapılan</div>
+                        <div id="statsMostWrong" class="stats-list"></div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- ── SETTINGS PAGE ── -->
+        <div id="settingsPage" style="display:none; flex:1; flex-direction:column;">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="btn-back" id="closeSettingsBtn"><i class="fas fa-arrow-left"></i></button>
+                    <span class="page-title">Ayarlar</span>
+                </div>
+            </div>
+
+            <div class="settings-page-content">
+
+                <!-- SECTION: Görünüm -->
+                <div class="settings-section">
+                    <div class="settings-section-label">
+                        <i class="fas fa-palette"></i> Görünüm
+                    </div>
+                    <div class="settings-card">
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Tema</div>
+                                <div class="settings-row-desc">Uygulama rengini seçin</div>
+                            </div>
+                            <div class="theme-toggle-group">
+                                <button class="theme-chip" id="themeDark" onclick="setTheme('dark')">
+                                    <i class="fas fa-moon"></i> Koyu
+                                </button>
+                                <button class="theme-chip" id="themeLight" onclick="setTheme('light')">
+                                    <i class="fas fa-sun"></i> Açık
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Veri -->
+                <div class="settings-section">
+                    <div class="settings-section-label">
+                        <i class="fas fa-database"></i> Veri Yönetimi
+                    </div>
+                    <div class="settings-card">
+                        <!-- Export JSON -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Kelimeleri Dışa Aktar (JSON)</div>
+                                <div class="settings-row-desc">Tüm kelimelerinizi JSON dosyası olarak indirin</div>
+                            </div>
+                            <button class="settings-action-btn" id="exportJsonBtn">
+                                <i class="fas fa-download"></i> İndir
+                            </button>
+                        </div>
+                        <!-- Export CSV -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Kelimeleri Dışa Aktar (CSV)</div>
+                                <div class="settings-row-desc">Excel ile açılabilir CSV dosyası olarak indirin</div>
+                            </div>
+                            <button class="settings-action-btn" id="exportCsvBtn">
+                                <i class="fas fa-file-csv"></i> İndir
+                            </button>
+                        </div>
+                        <!-- Import -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Kelimeleri İçe Aktar (JSON)</div>
+                                <div class="settings-row-desc">Daha önce dışa aktardığınız JSON dosyasını yükleyin</div>
+                            </div>
+                            <label class="settings-action-btn" for="importFileInput" style="cursor:pointer;">
+                                <i class="fas fa-upload"></i> Yükle
+                            </label>
+                            <input type="file" id="importFileInput" accept=".json" style="display:none;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 </div>
 
