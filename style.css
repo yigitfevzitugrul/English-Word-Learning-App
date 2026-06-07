@@ -675,6 +675,21 @@ body {
 }
 .settings-action-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 
+.quiz-limit-group {
+    display:flex; gap:5px; flex-wrap:wrap; flex-shrink:0;
+    background:var(--surface-2); border:1px solid var(--border);
+    border-radius:var(--radius-sm); padding:4px;
+}
+.quiz-limit-chip {
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:5px 13px; border-radius:5px; border:none;
+    background:transparent; color:var(--text-3);
+    font-family:inherit; font-size:12px; font-weight:600;
+    cursor:pointer; transition:all var(--transition); white-space:nowrap; min-width:38px;
+}
+.quiz-limit-chip:hover  { color:var(--text-2); background:var(--surface); }
+.quiz-limit-chip.active { background:var(--accent); color:#fff; box-shadow:0 2px 8px var(--accent-glow); }
+
 /* ── TOAST ── */
 .toast-container { position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:8px; z-index:1000; }
 .toast {

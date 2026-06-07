@@ -13,11 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSort    = 'default';
     let currentView    = 'grid';   // 'grid' | 'list'
     let quizMode       = 'classic'; // 'classic' | 'multi'
+    let quizDailyLimit = 10; // will be loaded from backend in init()
 
-    // ── INIT ─────────────────────────────────────────────────────
+    // ── INIT ──────────────────────────────────────────────────────────
     async function init() {
         await loadWords();
         await loadStreak();
+        // Load persisted quiz limit from backend
+        try {
+            quizDailyLimit = await pywebview.api.get_quiz_limit();
+        } catch { quizDailyLimit = 10; }
+        applyQuizLimitUI();
     }
 
     // ── THEME ────────────────────────────────────────────────────
@@ -519,6 +525,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const openSettingsBtn  = document.getElementById('openSettingsBtn');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
+    // ── QUIZ LIMIT CHIPS ─────────────────────────────────────────
+    function applyQuizLimitUI() {
+        document.querySelectorAll('.quiz-limit-chip').forEach(btn => {
+            const val = parseInt(btn.dataset.limit, 10);
+            btn.classList.toggle('active', val === quizDailyLimit);
+        });
+    }
+    applyQuizLimitUI();
+
+    document.getElementById('quizLimitGroup').addEventListener('click', e => {
+        const btn = e.target.closest('.quiz-limit-chip');
+        if (!btn) return;
+        quizDailyLimit = parseInt(btn.dataset.limit, 10);
+        // Persist to backend (stats.json) instead of localStorage
+        pywebview.api.set_quiz_limit(quizDailyLimit).catch(err => console.error('set_quiz_limit error:', err));
+        applyQuizLimitUI();
+        showToast(quizDailyLimit === 0
+            ? 'Quiz limiti kaldırıldı (sınırsız).'
+            : `Günlük quiz limiti ${quizDailyLimit} kelime olarak ayarlandı.`);
+    });
+
     openSettingsBtn.addEventListener('click', () => {
         mainContent.style.display  = 'none';
         quizSection.style.display  = 'none';
@@ -683,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('quizGroupNum').textContent   = info.group_number;
             document.getElementById('quizGroupCount').textContent = `${info.remaining} kelime`;
 
-            quizWords        = await pywebview.api.get_quiz_words();
+            quizWords        = await pywebview.api.get_quiz_words(quizDailyLimit);
             allQuizWords     = await pywebview.api.get_all_words_for_quiz();
             currentQuizIndex = 0;
 

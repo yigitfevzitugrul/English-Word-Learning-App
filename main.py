@@ -52,11 +52,16 @@ class Api:
                 'streak': 0,
                 'last_active_date': None,
                 'daily_learned': {},   # "YYYY-MM-DD": count
+                'quiz_limit': 10,
             }
             self._save_stats()
         else:
             with open(STATS_FILE, 'r', encoding='utf-8') as f:
                 self.stats = json.load(f)
+            # Backward compatibility: add quiz_limit if missing
+            if 'quiz_limit' not in self.stats:
+                self.stats['quiz_limit'] = 10
+                self._save_stats()
 
     def _save_stats(self):
         with open(STATS_FILE, 'w', encoding='utf-8') as f:
@@ -188,33 +193,44 @@ class Api:
         return groups
 
     def get_quiz_info(self):
-        today_group = datetime.date.today().weekday()
         day_names = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar']
-        groups = self._build_groups()
-        today_ids = set(groups[today_group])
-        total_in_group = len(today_ids)
-        remaining = sum(
-            1 for w in self.words
-            if w['id'] in today_ids and not w.get('permanently_learned', False)
-        )
+        today_group = datetime.date.today().weekday()
+        total = len(self.words)
+        remaining = sum(1 for w in self.words if not w.get('permanently_learned', False))
         return {
-            'group_number':  today_group + 1,
-            'day_name':      day_names[today_group],
-            'total_words':   len(self.words),
-            'words_in_group': total_in_group,
-            'remaining':     remaining,
+            'group_number':   today_group + 1,
+            'day_name':       day_names[today_group],
+            'total_words':    total,
+            'words_in_group': remaining,
+            'remaining':      remaining,
         }
 
-    def get_quiz_words(self):
+    def get_quiz_limit(self):
+        """Return the persisted quiz daily limit."""
+        return self.stats.get('quiz_limit', 10)
+
+    def set_quiz_limit(self, limit):
+        """Persist the quiz daily limit to stats.json."""
+        self.stats['quiz_limit'] = int(limit)
+        self._save_stats()
+        return True
+
+    def get_quiz_words(self, limit=0):
         self._load_db()
-        today_group = datetime.date.today().weekday()
-        groups = self._build_groups()
-        today_ids = set(groups[today_group])
         result = []
         for word in self.words:
-            if word['id'] in today_ids and not word.get('permanently_learned', False):
+            if not word.get('permanently_learned', False):
                 self._ensure_fields(word)
                 result.append(word)
+        # Sort: needs_review first, then by wrong count (harder words first), then by id
+        result.sort(key=lambda w: (
+            0 if w.get('needs_review') else 1,
+            -(w.get('quiz_wrong_count') or 0),
+            w['id']
+        ))
+        # Apply daily limit (0 = unlimited)
+        if limit and limit > 0:
+            result = result[:limit]
         return result
 
     def get_all_words_for_quiz(self):

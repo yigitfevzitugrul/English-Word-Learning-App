@@ -4,66 +4,78 @@
         "english": "Rarely",
         "translation": "Nadiren",
         "example": "I rarely see you lately",
-        "learned_at": "2026-05-20T10:09:07.547366",
-        "needs_review": true,
+        "learned_at": "2026-06-07T13:15:06.504583",
+        "needs_review": false,
         "example_turkish": "",
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 2,
         "english": "Often",
         "translation": "Sık Sık",
         "example": "I often walk at the weekends.",
-        "learned_at": "2026-05-20T10:09:06.535908",
-        "needs_review": true,
+        "learned_at": "2026-06-07T13:15:09.471495",
+        "needs_review": false,
         "example_turkish": "",
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 3,
         "english": "Lottery",
         "translation": "Piyango",
         "example": "He could win the lottery",
-        "learned_at": "2026-05-20T10:09:05.201717",
-        "needs_review": true,
+        "learned_at": "2026-06-07T13:15:12.124878",
+        "needs_review": false,
         "example_turkish": "",
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 4,
         "english": "Structure",
         "translation": "Yapı",
         "example": "That's why every company has a unique security approach and security team structure.",
-        "learned_at": "2026-05-20T10:09:03.253942",
-        "needs_review": true,
+        "learned_at": "2026-06-07T13:15:20.010242",
+        "needs_review": false,
         "example_turkish": "",
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 5,
         "english": "Approach",
         "translation": "Yaklaşım",
         "example": "He has a different approach toward me",
-        "learned_at": "2026-05-20T10:08:41.388866",
-        "needs_review": true,
+        "learned_at": "2026-06-07T13:15:28.207653",
+        "needs_review": false,
         "example_turkish": "Bana karşı farklı bir yaklaşımı var",
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 6,
         "english": "Toward",
         "translation": "–e doğru",
         "example": "My parents taught me to be considerate toward the poor.",
-        "learned_at": "2026-05-20T10:08:30.541232",
-        "needs_review": true,
+        "learned_at": "2026-06-07T13:15:43.608228",
+        "needs_review": false,
         "example_turkish": "Ailem bana yoksullara karşı düşünceli olmayı öğretti.",
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 7,
@@ -74,7 +86,9 @@
         "needs_review": false,
         "example_turkish": "Mavi Takım, savunma amaçlı güvenlikle ilgilidir; yani saldırıları sürekli olarak izler ve bunlara hızlı bir şekilde müdahale etmeye çalışır",
         "quiz_correct_count": 2,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 8,
@@ -82,10 +96,12 @@
         "translation": "Asıl, Esas",
         "example": "The essential fact is that we have not yet sufficiently registered this.",
         "example_turkish": "Asıl gerçek ise bunu henüz yeterince tescil ettirememiş olmamızdır.",
-        "learned_at": "2026-05-13T21:19:46.774551",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:16:09.845923",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 9,
@@ -96,7 +112,9 @@
         "learned_at": "2026-06-02T22:07:27.611070",
         "needs_review": false,
         "quiz_correct_count": 2,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 10,
@@ -104,10 +122,12 @@
         "translation": "Oldukça, Tercih ederim ki, Aksine",
         "example": "The results are rather mixed.",
         "example_turkish": "Sonuçlar oldukça karışık.",
-        "learned_at": "2026-05-13T21:18:18.676971",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:16:29.476618",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 11,
@@ -118,7 +138,9 @@
         "learned_at": "2026-06-02T22:07:02.670557",
         "needs_review": false,
         "quiz_correct_count": 1,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 12,
@@ -126,10 +148,12 @@
         "translation": "Çeşitli",
         "example": "I would like to mention some of the various items.",
         "example_turkish": "Çeşitli konulardan bazılarına değinmek istiyorum.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-03T11:04:06.784411",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 1,
+        "notes": ""
     },
     {
         "id": 13,
@@ -137,10 +161,12 @@
         "translation": "Etkili, Tutumlu",
         "example": "Both methods are more efficient than chemotherapy.",
         "example_turkish": "Her iki yöntem de kemoterapiden daha etkilidir.",
-        "learned_at": "2026-05-20T10:04:35.404458",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-03T11:02:49.381524",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 14,
@@ -148,10 +174,12 @@
         "translation": "Hükümet, Yönetim",
         "example": "This is where governments must take some action at last!",
         "example_turkish": "İşte bu noktada hükümetlerin artık harekete geçmesi gerekiyor!",
-        "learned_at": "2026-05-20T10:04:19.461318",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-03T11:03:00.117281",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 15,
@@ -159,10 +187,12 @@
         "translation": "Sınırlı, Dar",
         "example": "This paint comes in only a narrow range of colors.",
         "example_turkish": "Bu boyanın yalnızca sınırlı bir renk yelpazesi mevcut.",
-        "learned_at": "2026-05-20T10:03:54.685623",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-03T11:03:18.484617",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 16,
@@ -170,10 +200,12 @@
         "translation": "Genişletmek",
         "example": "We will extend our garage for my bike.",
         "example_turkish": "Bisikletim için garajımızı genişleteceğiz.",
-        "learned_at": "2026-05-20T10:03:44.658933",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-03T11:03:25.742238",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 17,
@@ -181,10 +213,12 @@
         "translation": "Mimar",
         "example": "I will be architect.",
         "example_turkish": "Mimar olacağım.",
-        "learned_at": "2026-05-20T10:03:31.868492",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:14:58.499443",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 1,
+        "notes": ""
     },
     {
         "id": 18,
@@ -195,7 +229,9 @@
         "learned_at": "2026-05-20T10:03:27.679016",
         "needs_review": true,
         "quiz_correct_count": 0,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 3,
+        "notes": ""
     },
     {
         "id": 19,
@@ -203,10 +239,12 @@
         "translation": "Üzüm",
         "example": "This was the best grape I have ever eaten.",
         "example_turkish": "Bu yediğim en iyi üzümdü",
-        "learned_at": "2026-05-20T10:02:52.547323",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:16:52.035126",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 20,
@@ -214,10 +252,12 @@
         "translation": "Kazanmak",
         "example": "You have to earn her respect.",
         "example_turkish": "Onun saygısını kazanmak/hak etmek zorundasın.",
-        "learned_at": "2026-05-20T10:02:47.372159",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:17:01.535569",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 21,
@@ -225,10 +265,12 @@
         "translation": "Alışkanlık",
         "example": "I gained a habit that makes me feel happy.",
         "example_turkish": "Mutlu olmamı sağlayan bir alışkanlık edindim.",
-        "learned_at": "2026-05-20T10:02:30.078488",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:17:04.446686",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 22,
@@ -236,10 +278,12 @@
         "translation": "Marangoz",
         "example": "The carpenter cut the board crookedly.",
         "example_turkish": "Marangoz tahtayı yamuk kesti",
-        "learned_at": "2026-05-26T15:49:16.510912",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:17:11.651590",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 23,
@@ -247,10 +291,12 @@
         "translation": "ödünç vermek",
         "example": "I lend a toy to my best friend",
         "example_turkish": "En iyi arkadaşıma bir oyuncak ödünç veririm.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:17:26.347804",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 24,
@@ -258,10 +304,12 @@
         "translation": "kaydolmak",
         "example": "She enrolled in a history course.",
         "example_turkish": "o tarih kursuna kaydoldu.",
-        "learned_at": "2026-05-26T15:48:57.582662",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:17:36.184665",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 25,
@@ -269,10 +317,12 @@
         "translation": "trenyolu",
         "example": "The crashed truck was blocking the railway.",
         "example_turkish": "Kaza yapan kamyon demiryolunu kapatıyordu.",
-        "learned_at": "2026-05-26T15:48:54.001357",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:17:47.147456",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 26,
@@ -280,10 +330,12 @@
         "translation": "buzdolabı",
         "example": "My parents can't afford a new refrigerator.",
         "example_turkish": "Ailemin yeni bir buzdolabı alacak parası yok.",
-        "learned_at": "2026-05-26T15:48:37.183930",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:19:13.527676",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 27,
@@ -294,7 +346,9 @@
         "learned_at": null,
         "needs_review": true,
         "quiz_correct_count": 0,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 1,
+        "notes": ""
     },
     {
         "id": 28,
@@ -302,10 +356,12 @@
         "translation": "kibar",
         "example": "Japanese people in general are polite.",
         "example_turkish": "Japonlar genellikle kibarlardır.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:19:33.118053",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 29,
@@ -313,10 +369,12 @@
         "translation": "tuvalet",
         "example": "Where's the nearest restroom?",
         "example_turkish": "En yakın tuvalet nerededir ?",
-        "learned_at": "2026-05-26T15:47:31.956377",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-06T18:54:19.978617",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 1,
+        "notes": ""
     },
     {
         "id": 30,
@@ -324,10 +382,12 @@
         "translation": "güneş (doğmak)",
         "example": "A new sun, the daughter of the previous one, will rise in the sky.",
         "example_turkish": "Bir öncekinin kızı olan yeni bir güneş gökyüzünde doğacak.",
-        "learned_at": "2026-05-26T15:47:28.997635",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-06T18:54:30.934385",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 31,
@@ -335,10 +395,12 @@
         "translation": "ırmak",
         "example": "The locals use canoes to pass the river.",
         "example_turkish": "Bölge halkı nehri geçmek için kano kullanıyor.",
-        "learned_at": "2026-05-26T15:47:26.398440",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-06T18:54:33.765342",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 32,
@@ -346,10 +408,12 @@
         "translation": "çatı",
         "example": "The wind triumphed over electricity pylons, roofs, traffic signs and, ultimately over the forest.",
         "example_turkish": "Rüzgar elektrik direklerine, çatılara, trafik işaretlerine ve nihayetinde ormana galip geldi.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-06T18:54:47.117630",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 33,
@@ -357,10 +421,12 @@
         "translation": "raf",
         "example": "Can you put these books on the top shelf?",
         "example_turkish": "Bu kitapları en üst rafa koyabilir misin?",
-        "learned_at": "2026-05-26T15:47:04.095027",
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-06T18:55:01.597715",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 34,
@@ -368,10 +434,12 @@
         "translation": "fırın",
         "example": "Just dont put them in the oven",
         "example_turkish": "Sadece onları fırına koymayın.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:19:34.933997",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 35,
@@ -379,10 +447,12 @@
         "translation": "gazeteci",
         "example": "My cousin wants to be a journalist more than anything",
         "example_turkish": "Kuzenim gazeteci olmayı her şeyden çok istiyor.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:19:36.733772",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 36,
@@ -390,10 +460,12 @@
         "translation": "öğün",
         "example": "Breakfast is an important meal",
         "example_turkish": "kahvaltı en önemli öğün.",
-        "learned_at": null,
-        "needs_review": true,
-        "quiz_correct_count": 0,
-        "permanently_learned": false
+        "learned_at": "2026-06-07T13:19:38.948651",
+        "needs_review": false,
+        "quiz_correct_count": 1,
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     },
     {
         "id": 37,
@@ -404,7 +476,9 @@
         "learned_at": null,
         "needs_review": true,
         "quiz_correct_count": 0,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 1,
+        "notes": ""
     },
     {
         "id": 38,
@@ -415,6 +489,8 @@
         "learned_at": null,
         "needs_review": true,
         "quiz_correct_count": 0,
-        "permanently_learned": false
+        "permanently_learned": false,
+        "quiz_wrong_count": 0,
+        "notes": ""
     }
 ]
