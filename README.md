@@ -102,6 +102,7 @@ node --test "tests/*.test.js"         # JavaScript: cevap kontrolü, sözlük ay
 ├── app.js               # Arayüz mantığı: kelime listesi, form, quiz, ayarlar
 ├── answer.js            # Yazılı cevap kontrolü (yazım hatası toleransı)
 ├── dictionary.js        # Sözlük bilgisi (Free Dictionary + Datamuse)
+├── vendor/              # Uygulamayla gelen Inter yazı tipi ve Font Awesome ikonları (lisanslarıyla)
 ├── tests/               # Python (unittest) ve JavaScript (node:test) testleri
 ├── Lingua.spec          # PyInstaller yapılandırması
 ├── requirements.txt     # Çalıştırma bağımlılıkları

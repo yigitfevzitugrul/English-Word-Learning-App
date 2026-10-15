@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    window.addEventListener('pywebviewready', init);
 
     const form          = document.getElementById('wordForm');
     const submitBtn     = document.getElementById('submitBtn');
@@ -1524,4 +1523,16 @@ document.addEventListener('DOMContentLoaded', () => {
             showQuizCard();
         }
     }
+
+    // ── START ────────────────────────────────────────────────────
+    // Her şey tanımlandıktan sonra başlar. pywebview API'si bu noktadan önce
+    // hazır olmuşsa 'pywebviewready' bir daha gelmez; init yine tam bir kez çalışır.
+    let started = false;
+    function startOnce() {
+        if (started) return;
+        started = true;
+        init();
+    }
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.get_words) startOnce();
+    else window.addEventListener('pywebviewready', startOnce);
 });
