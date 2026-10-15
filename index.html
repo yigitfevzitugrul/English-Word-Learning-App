@@ -190,14 +190,12 @@
                     <span id="quizProgress" class="quiz-prog"></span>
                 </div>
 
-                <!-- Daily group info banner -->
+                <!-- Today's queue banner -->
                 <div id="quizDayInfo" class="quiz-day-info">
                     <span class="quiz-day-label">
-                        <i class="fas fa-calendar-day"></i>
-                        <span id="quizDayName">Pazartesi</span>
-                        &mdash; Grup <span id="quizGroupNum">1</span>/7
+                        <i class="fas fa-calendar-day"></i> Bugünkü tekrarlar
                     </span>
-                    <span id="quizGroupCount" class="quiz-group-badge">0 kelime</span>
+                    <span id="quizQueueInfo" class="quiz-group-badge">0 tekrar · 0 yeni</span>
                 </div>
 
                 <!-- Classic quiz card -->
@@ -210,7 +208,7 @@
                         </button>
                     </div>
 
-                    <div id="quizCorrectDots" class="quiz-correct-dots"></div>
+                    <div id="quizSrsInfo" class="quiz-srs-info"></div>
 
                     <div id="quizHiddenPart" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
                         <p id="quizTranslation" class="quiz-translation"></p>
@@ -231,16 +229,22 @@
                             <i class="fas fa-volume-up"></i>
                         </button>
                     </div>
-                    <div id="quizMultiCorrectDots" class="quiz-correct-dots"></div>
+                    <div id="quizMultiSrsInfo" class="quiz-srs-info"></div>
                     <div id="quizMultiChoices" class="quiz-choices"></div>
                 </div>
 
                 <div id="quizActions" class="quiz-actions" style="display:none;">
-                    <button class="quiz-btn wrong" onclick="handleQuizAnswer(false)">
-                        <i class="fas fa-times"></i> Bilemedim
+                    <button class="quiz-btn wrong" data-grade="again">
+                        <span><i class="fas fa-times"></i> Bilmedim</span>
+                        <span class="quiz-btn-hint" data-hint="again"></span>
                     </button>
-                    <button class="quiz-btn right" onclick="handleQuizAnswer(true)">
-                        <i class="fas fa-check"></i> Bildim
+                    <button class="quiz-btn hard" data-grade="hard">
+                        <span><i class="fas fa-minus"></i> Zor</span>
+                        <span class="quiz-btn-hint" data-hint="hard"></span>
+                    </button>
+                    <button class="quiz-btn right" data-grade="good">
+                        <span><i class="fas fa-check"></i> Bildim</span>
+                        <span class="quiz-btn-hint" data-hint="good"></span>
                     </button>
                 </div>
             </div>
@@ -364,8 +368,8 @@
                     <div class="settings-card">
                         <div class="settings-row">
                             <div class="settings-row-info">
-                                <div class="settings-row-title">Günlük Quiz Kelime Sayısı</div>
-                                <div class="settings-row-desc">Her gün quizde kaç kelime sorulsun</div>
+                                <div class="settings-row-title">Quiz Kart Sayısı</div>
+                                <div class="settings-row-desc">Bir quizde en fazla kaç kart sorulsun (önce tekrarlar, sonra yeni kelimeler)</div>
                             </div>
                             <div class="quiz-limit-group" id="quizLimitGroup">
                                 <button class="quiz-limit-chip" data-limit="5">5</button>

@@ -455,9 +455,10 @@ body {
     font-size:11px; color:var(--text-3);
     display:flex; align-items:center; gap:5px; margin-left:auto;
 }
-.card-quiz-dots { display:flex; align-items:center; gap:4px; flex-shrink:0; }
-.dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background var(--transition),transform var(--transition); }
-.dot.filled { background:var(--accent); transform:scale(1.15); }
+.srs-interval {
+    font-size:11px; font-weight:600; color:var(--accent);
+    background:var(--accent-dim); border-radius:99px; padding:2px 8px; flex-shrink:0;
+}
 
 /* ── LIST VIEW ── */
 .words-list { display:flex; flex-direction:column; gap:8px; }
@@ -551,12 +552,17 @@ body {
 
 .quiz-actions { display:flex; gap:10px; justify-content:center; }
 .quiz-btn {
-    padding:10px 28px; border-radius:var(--radius-sm);
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding:10px 24px; border-radius:var(--radius-sm);
     font-family:inherit; font-size:14px; font-weight:600;
     cursor:pointer; border:1px solid transparent; transition:all var(--transition);
 }
+.quiz-btn:disabled { opacity:0.6; cursor:default; }
+.quiz-btn-hint { font-size:11px; font-weight:500; opacity:0.75; }
 .quiz-btn.wrong { background:var(--red-dim); color:var(--red); border-color:rgba(247,92,92,0.25); }
 .quiz-btn.wrong:hover { background:rgba(247,92,92,0.25); }
+.quiz-btn.hard { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(247,184,79,0.25); }
+.quiz-btn.hard:hover { background:rgba(247,184,79,0.25); }
 .quiz-btn.right { background:var(--green-dim); color:var(--green); border-color:rgba(62,207,142,0.25); }
 .quiz-btn.right:hover { background:rgba(62,207,142,0.25); }
 
@@ -577,12 +583,7 @@ body {
     border-radius:99px; padding:3px 10px; white-space:nowrap;
 }
 
-.quiz-correct-dots { display:flex; gap:8px; align-items:center; justify-content:center; margin:2px 0; }
-.quiz-dot {
-    width:12px; height:12px; border-radius:50%;
-    background:var(--border); border:1.5px solid var(--border); transition:all 0.25s ease;
-}
-.quiz-dot.filled { background:var(--accent); border-color:var(--accent); box-shadow:0 0 6px var(--accent-glow); transform:scale(1.2); }
+.quiz-srs-info { font-size:12px; font-weight:500; color:var(--text-2); text-align:center; margin:2px 0; }
 
 .btn-exit {
     display:inline-flex; align-items:center; gap:6px; padding:9px 20px;
