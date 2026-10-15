@@ -35,6 +35,17 @@
                             <i class="fas fa-volume-up"></i>
                         </button>
                     </div>
+                    <div class="dict-info" id="dictInfo" style="display:none;">
+                        <div class="dict-info-head">
+                            <span id="dictInfoMain"></span>
+                            <button type="button" class="dict-info-clear" id="dictClearBtn" title="Sözlük bilgisini kaldır">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="dict-info-def" id="dictInfoDef"></div>
+                        <div class="dict-info-syn" id="dictInfoSyn"></div>
+                    </div>
+                    <div class="dict-status" id="dictStatus" style="display:none;"></div>
                 </div>
 
                 <div class="field">
@@ -49,8 +60,12 @@
                 </div>
 
                 <div class="field">
-                    <label for="example">İngilizce Örnek Cümle</label>
-                    <textarea id="example" placeholder="Finding this café was pure serendipity." required></textarea>
+                    <label for="example">
+                        İngilizce Örnek Cümle
+                        <span class="optional-label">isteğe bağlı</span>
+                    </label>
+                    <textarea id="example" placeholder="Finding this café was pure serendipity."></textarea>
+                    <div class="translate-suggestion" id="exampleSuggestion" style="display:none;"></div>
                 </div>
 
                 <div class="field">
@@ -509,6 +524,16 @@
                             </label>
                             <input type="file" id="importFileInput" accept=".json" style="display:none;">
                         </div>
+                        <!-- Sözlük bilgisi doldur -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Eksik Sözlük Bilgilerini Doldur</div>
+                                <div class="settings-row-desc">Telaffuzu, türü ve tanımı olmayan kelimeler için sözlükte arama yapar (internet gerekir)</div>
+                            </div>
+                            <button class="settings-action-btn" id="fillDetailsBtn">
+                                <i class="fas fa-book"></i> Doldur
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -535,6 +560,7 @@
 </div>
 
 <script src="answer.js"></script>
+<script src="dictionary.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

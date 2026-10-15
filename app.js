@@ -75,10 +75,83 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── DICTIONARY LOOKUP ────────────────────────────────────────
+    // formDetails: null = dokunulmadı (düzenlemede mevcut bilgi korunur), {} = silindi
+    let formDetails      = null;
+    let lastLookupWord   = '';
+    let lookupSeq        = 0;
+    const englishInput   = document.getElementById('english');
+    const exampleInput   = document.getElementById('example');
+    const dictStatus     = document.getElementById('dictStatus');
+    const exampleSuggest = document.getElementById('exampleSuggestion');
+
+    function hasDetails(d) {
+        return !!(d && (d.phonetic || d.definition || (d.synonyms && d.synonyms.length)));
+    }
+
+    function renderDictInfo(d) {
+        const box = document.getElementById('dictInfo');
+        if (!hasDetails(d)) { box.style.display = 'none'; return; }
+        document.getElementById('dictInfoMain').textContent =
+            [d.phonetic, posLabel(d.part_of_speech)].filter(Boolean).join(' · ');
+        document.getElementById('dictInfoDef').textContent = d.definition || '';
+        document.getElementById('dictInfoSyn').textContent =
+            d.synonyms && d.synonyms.length ? `Eş anlamlı: ${d.synonyms.join(', ')}` : '';
+        box.style.display = 'flex';
+    }
+
+    function resetDictUI(details = null) {
+        formDetails    = details;
+        lastLookupWord = '';
+        lookupSeq++;
+        renderDictInfo(details);
+        dictStatus.style.display     = 'none';
+        exampleSuggest.style.display = 'none';
+    }
+
+    async function lookupDictionary(word) {
+        const q = word.trim();
+        if (!q || q.toLowerCase() === lastLookupWord) return;
+        lastLookupWord = q.toLowerCase();
+        const seq = ++lookupSeq;
+
+        dictStatus.textContent   = 'Sözlükte aranıyor...';
+        dictStatus.style.display = 'block';
+        const result = await LinguaDictionary.lookup(q);
+        if (seq !== lookupSeq) return;   // bu arada başka kelime yazıldı
+
+        if (!result) {
+            dictStatus.textContent = 'Sözlükte bulunamadı (ya da internet bağlantısı yok).';
+            lastLookupWord = '';       // sonra yeniden denenebilsin
+            return;
+        }
+        dictStatus.style.display = 'none';
+        formDetails = result;
+        renderDictInfo(result);
+
+        if (result.example && !exampleInput.value.trim()) {
+            exampleSuggest.textContent   = `Örnek cümle önerisi: ${result.example}`;
+            exampleSuggest.style.display = 'block';
+            exampleSuggest.onclick = () => {
+                exampleInput.value = result.example;
+                exampleSuggest.style.display = 'none';
+            };
+        }
+    }
+
+    // Kelime yazılıp alandan çıkılınca sözlük bilgisi kendiliğinden gelir
+    englishInput.addEventListener('change', () => lookupDictionary(englishInput.value));
+
+    document.getElementById('dictClearBtn').addEventListener('click', () => {
+        resetDictUI({});
+        lastLookupWord = englishInput.value.trim().toLowerCase();   // hemen yeniden getirmesin
+    });
+
     // ── AUTO TRANSLATE ───────────────────────────────────────────
     document.getElementById('autoTranslateBtn').addEventListener('click', async () => {
         const eng = document.getElementById('english').value.trim();
         if (!eng) { showToast('Önce İngilizce kelimeyi girin.', 'error'); return; }
+        lookupDictionary(eng);
         const btn = document.getElementById('autoTranslateBtn');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         btn.disabled = true;
@@ -213,7 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 w.translation.toLowerCase().includes(searchQuery) ||
                 (w.example||'').toLowerCase().includes(searchQuery) ||
                 (w.example_turkish||'').toLowerCase().includes(searchQuery) ||
-                (w.notes||'').toLowerCase().includes(searchQuery)
+                (w.notes||'').toLowerCase().includes(searchQuery) ||
+                (w.definition||'').toLowerCase().includes(searchQuery)
             );
         }
 
@@ -283,10 +357,18 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `<button class="icon-btn btn-review" data-action="review" title="Öğrendim"><i class="fas fa-check"></i></button>`
             : '';
 
-        const exampleAudioBtn = word.example ? `
-            <button class="icon-btn btn-speak-sm" data-action="speak-example" title="Örnek cümleyi dinle">
-                <i class="fas fa-volume-up"></i>
-            </button>` : '';
+        const exampleHtml = word.example ? `
+            <div class="word-example-row">
+                <div class="word-example">"${escapeHtml(word.example)}"</div>
+                <button class="icon-btn btn-speak-sm" data-action="speak-example" title="Örnek cümleyi dinle">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>` : '';
+
+        const phoneticText = [word.phonetic, posLabel(word.part_of_speech)].filter(Boolean).join(' · ');
+        const phoneticHtml = phoneticText
+            ? `<div class="word-phonetic" title="${escapeHtml(word.definition || '')}">${escapeHtml(phoneticText)}</div>`
+            : '';
 
         card.innerHTML = `
             <div class="card-head">
@@ -300,12 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="card-body">
                 <div class="word-english">${escapeHtml(word.english)}</div>
+                ${phoneticHtml}
                 <div class="word-turkish">${escapeHtml(word.translation)}</div>
             </div>
-            <div class="word-example-row">
-                <div class="word-example">"${escapeHtml(word.example)}"</div>
-                ${exampleAudioBtn}
-            </div>
+            ${exampleHtml}
             ${trSection}
             ${notesHtml}
             <div class="card-foot">
@@ -601,12 +681,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             if (isEditMode) {
-                await pywebview.api.update_word(parseInt(form.dataset.editId), english, translation, example, exampleTurkish, notes);
+                await pywebview.api.update_word(parseInt(form.dataset.editId), english, translation,
+                                                example, exampleTurkish, notes, formDetails);
                 cancelEdit();
                 showToast('Kelime güncellendi.');
             } else {
-                await pywebview.api.add_word(english, translation, example, exampleTurkish, notes);
+                await pywebview.api.add_word(english, translation, example, exampleTurkish, notes,
+                                             formDetails || {});
                 form.reset();
+                resetDictUI();
                 document.getElementById('translateSuggestion').style.display = 'none';
                 showToast('Kelime eklendi.');
             }
@@ -631,6 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelEditBtn.style.display = 'none';
         document.getElementById('formTitle').textContent = 'Yeni Kelime Ekle';
         document.getElementById('translateSuggestion').style.display = 'none';
+        resetDictUI();
     };
 
     // ── EDIT WORD ────────────────────────────────────────────────
@@ -642,6 +726,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('example').value        = word.example;
         document.getElementById('exampleTurkish').value = word.example_turkish || '';
         document.getElementById('wordNotes').value      = word.notes || '';
+
+        // Mevcut sözlük bilgisini göster; kelime değişmedikçe yeniden aranmaz
+        resetDictUI(null);
+        renderDictInfo(word);
+        lastLookupWord = word.english.trim().toLowerCase();
 
         form.dataset.mode   = 'edit';
         form.dataset.editId = id;
@@ -969,8 +1058,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('exportCsvBtn').addEventListener('click', async () => {
         try {
             const words = await pywebview.api.export_words();
-            const header = ['id','english','translation','example','example_turkish','category','difficulty','notes','learned_at','quiz_correct_count','quiz_wrong_count','permanently_learned'];
-            const rows   = words.map(w => header.map(k => `"${String(w[k]||'').replace(/"/g,'""')}"`).join(','));
+            const header = ['id','english','translation','example','example_turkish','notes',
+                            'phonetic','part_of_speech','definition','synonyms',
+                            'learned_at','quiz_correct_count','quiz_wrong_count','permanently_learned'];
+            const cell   = v => Array.isArray(v) ? v.join('; ') : (v ?? '');
+            const rows   = words.map(w => header.map(k => `"${String(cell(w[k])).replace(/"/g,'""')}"`).join(','));
             const csv    = [header.join(','), ...rows].join('\n');
             const blob   = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
             downloadBlob(blob, 'lingua_kelimeler.csv');
@@ -1001,6 +1093,39 @@ document.addEventListener('DOMContentLoaded', () => {
             await loadWords();
         } catch { showToast('İçe aktarma hatası. Geçerli bir JSON dosyası seçin.','error'); }
         e.target.value = '';
+    });
+
+    // ── FILL MISSING DICTIONARY DETAILS ──────────────────────────
+    document.getElementById('fillDetailsBtn').addEventListener('click', async e => {
+        const btn = e.currentTarget;
+        const words = (await pywebview.api.get_words()).filter(w => !hasDetails(w));
+        if (words.length === 0) {
+            showToast('Tüm kelimelerin sözlük bilgisi zaten var.');
+            return;
+        }
+        const original = btn.innerHTML;
+        btn.disabled = true;
+        let found = 0;
+        try {
+            for (let i = 0; i < words.length; i++) {
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${i + 1}/${words.length}`;
+                const details = await LinguaDictionary.lookup(words[i].english);
+                if (details) {
+                    await pywebview.api.set_word_details(words[i].id, details);
+                    found++;
+                }
+            }
+            const missing = words.length - found;
+            showToast(`${found} kelimenin sözlük bilgisi eklendi` +
+                      (missing ? `, ${missing} kelime bulunamadı.` : '.'));
+            await loadWords();
+        } catch (err) {
+            console.error(err);
+            showToast('Sözlük bilgileri doldurulurken hata oluştu.', 'error');
+        } finally {
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }
     });
 
     // ── QUIZ LOGIC ───────────────────────────────────────────────

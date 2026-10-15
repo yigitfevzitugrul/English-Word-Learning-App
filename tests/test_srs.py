@@ -188,6 +188,34 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(w['quiz_correct_count'], 1)
         self.assertFalse(w['permanently_learned'])
 
+    def test_dictionary_details_saved_and_sanitized(self):
+        api = self.main.Api()
+        api.add_word('rarely', 'nadiren', '', details={
+            'phonetic': '/ˈreə.li/', 'part_of_speech': 'adverb', 'definition': ' not often ',
+            'synonyms': ['seldom', '', 42], 'example': 'saklanmaz', 'evil': 'x'})
+        w = api.get_words()[0]
+        self.assertEqual((w['phonetic'], w['part_of_speech'], w['definition']),
+                         ('/ˈreə.li/', 'adverb', 'not often'))
+        self.assertEqual(w['synonyms'], ['seldom', '42'])
+        self.assertNotIn('evil', w)
+        self.assertNotIn('example_suggestion', w)
+
+    def test_update_keeps_details_unless_given(self):
+        api = self.main.Api()
+        api.add_word('w', 't', '', details={'phonetic': '/w/', 'synonyms': ['x']})
+        api.update_word(1, 'w', 't2', '')                      # None → korunur
+        self.assertEqual(api.get_words()[0]['phonetic'], '/w/')
+        api.update_word(1, 'w', 't2', '', '', '', {})         # {} → silinir
+        w = api.get_words()[0]
+        self.assertEqual((w['phonetic'], w['synonyms']), ('', []))
+        api.set_word_details(1, {'definition': 'yeni'})
+        self.assertEqual(api.get_words()[0]['definition'], 'yeni')
+
+    def test_old_words_get_empty_detail_fields(self):
+        self.write_words([{'id': 1, 'english': 'a', 'translation': 'x', 'example': ''}])
+        w = self.main.Api().get_words()[0]
+        self.assertEqual((w['phonetic'], w['definition'], w['synonyms']), ('', '', []))
+
     def test_bool_grades_still_accepted(self):
         api = self.main.Api()
         api.add_word('w', 't', 'e')

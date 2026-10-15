@@ -31,6 +31,9 @@ DB_FILE    = get_db_path()
 STATS_FILE = get_stats_path()
 INDEX_HTML = os.path.join(get_base_path(), 'index.html')
 
+# Sözlükten gelen metin alanları (eş anlamlılar ayrıca liste olarak tutulur)
+DETAIL_FIELDS = ('phonetic', 'part_of_speech', 'definition')
+
 
 # ── SAFE JSON I/O ────────────────────────────────────────────────
 def write_json_atomic(path, data):
@@ -128,6 +131,9 @@ class Api:
         word.setdefault('quiz_wrong_count', 0)
         word.setdefault('permanently_learned', False)
         word.setdefault('notes', '')
+        for key in DETAIL_FIELDS:
+            word.setdefault(key, '')
+        word.setdefault('synonyms', [])
         if 'srs' not in word:
             word['srs'] = srs.migrate_legacy(word, datetime.date.today())
             self._refresh(word, datetime.date.today())
@@ -153,8 +159,23 @@ class Api:
             'quiz_correct_count':  0,
             'quiz_wrong_count':    0,
             'permanently_learned': False,
+            'phonetic':            '',
+            'part_of_speech':      '',
+            'definition':          '',
+            'synonyms':            [],
             'srs':                 srs.new_state(),
         }
+
+    def _apply_details(self, word, details):
+        """Sözlük bilgisini (telaffuz, tür, tanım, eş anlamlılar) temizleyip yazar."""
+        if not isinstance(details, dict):
+            return
+        for key in DETAIL_FIELDS:
+            word[key] = str(details.get(key) or '').strip()[:300]
+        synonyms = details.get('synonyms') or []
+        if not isinstance(synonyms, list):
+            synonyms = []
+        word['synonyms'] = [str(s).strip()[:60] for s in synonyms if str(s).strip()][:8]
 
     def _find(self, word_id):
         return next((w for w in self.words if w['id'] == word_id), None)
@@ -227,26 +248,37 @@ class Api:
 
     @locked
     def add_word(self, english_word, translation, example_sentence,
-                 example_turkish='', notes=''):
+                 example_turkish='', notes='', details=None):
         new_word = self._new_word(
             max((w['id'] for w in self.words), default=0) + 1,
             english_word, translation, example_sentence, example_turkish, notes)
+        self._apply_details(new_word, details)
         self.words.append(new_word)
         self._save_db()
         return new_word
 
     @locked
     def update_word(self, word_id, english_word, translation, example_sentence,
-                    example_turkish='', notes=''):
-        for word in self.words:
-            if word['id'] == word_id:
-                word['english']         = english_word
-                word['translation']     = translation
-                word['example']         = example_sentence
-                word['example_turkish'] = example_turkish
-                word['notes']           = notes
-                break
-        self._save_db()
+                    example_turkish='', notes='', details=None):
+        """details=None sözlük bilgisini olduğu gibi bırakır, {} siler."""
+        word = self._find(word_id)
+        if word:
+            word['english']         = english_word
+            word['translation']     = translation
+            word['example']         = example_sentence
+            word['example_turkish'] = example_turkish
+            word['notes']           = notes
+            self._apply_details(word, details)
+            self._save_db()
+        return True
+
+    @locked
+    def set_word_details(self, word_id, details):
+        """Ayarlardaki "eksik sözlük bilgilerini doldur" için."""
+        word = self._find(word_id)
+        if word:
+            self._apply_details(word, details)
+            self._save_db()
         return True
 
     @locked
@@ -397,6 +429,7 @@ class Api:
                 str(item.get('example', '')).strip(),
                 str(item.get('example_turkish', '')).strip(),
                 str(item.get('notes', '')).strip())
+            self._apply_details(new_word, item)
             self.words.append(new_word)
             existing.add(eng.lower())
             imported += 1
