@@ -29,7 +29,12 @@
             <div class="form-fields" style="margin-top: 16px;">
                 <div class="field">
                     <label for="english">İngilizce Kelime</label>
-                    <input type="text" id="english" placeholder="Örn: Serendipity" required>
+                    <div class="input-with-action">
+                        <input type="text" id="english" placeholder="Örn: Serendipity" required>
+                        <button type="button" class="btn-translate" id="speakFormBtn" title="Telaffuzu Dinle">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="field">
@@ -198,7 +203,12 @@
                 <!-- Classic quiz card -->
                 <div id="quizCard" class="quiz-card">
                     <span class="quiz-label">Kelime</span>
-                    <h3 id="quizEnglish" class="quiz-word">—</h3>
+                    <div class="quiz-word-wrap">
+                        <h3 id="quizEnglish" class="quiz-word">—</h3>
+                        <button type="button" class="icon-btn btn-speak quiz-speak-btn" id="quizClassicSpeakBtn" title="Telaffuzu Dinle">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
 
                     <div id="quizCorrectDots" class="quiz-correct-dots"></div>
 
@@ -215,7 +225,12 @@
                 <!-- Multiple-choice quiz card -->
                 <div id="quizMultiCard" class="quiz-card" style="display:none;">
                     <span class="quiz-label">Bu kelimenin Türkçe anlamı nedir?</span>
-                    <h3 id="quizMultiEnglish" class="quiz-word">—</h3>
+                    <div class="quiz-word-wrap">
+                        <h3 id="quizMultiEnglish" class="quiz-word">—</h3>
+                        <button type="button" class="icon-btn btn-speak quiz-speak-btn" id="quizMultiSpeakBtn" title="Telaffuzu Dinle">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
                     <div id="quizMultiCorrectDots" class="quiz-correct-dots"></div>
                     <div id="quizMultiChoices" class="quiz-choices"></div>
                 </div>
@@ -359,6 +374,54 @@
                                 <button class="quiz-limit-chip" data-limit="20">20</button>
                                 <button class="quiz-limit-chip" data-limit="0">Sınırsız</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Telaffuz ve Ses -->
+                <div class="settings-section">
+                    <div class="settings-section-label">
+                        <i class="fas fa-volume-high"></i> Telaffuz ve Ses
+                    </div>
+                    <div class="settings-card">
+                        <!-- Aksan -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">İngilizce Aksanı</div>
+                                <div class="settings-row-desc">Kelimelerin telaffuz edileceği aksanı seçin</div>
+                            </div>
+                            <div class="speech-chip-group" id="accentGroup">
+                                <button type="button" class="speech-chip active" id="accentUS" onclick="setAccent('us')">
+                                    🇺🇸 Amerikan (US)
+                                </button>
+                                <button type="button" class="speech-chip" id="accentUK" onclick="setAccent('uk')">
+                                    🇬🇧 İngiliz (UK)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Okuma Hızı -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Okuma Hızı</div>
+                                <div class="settings-row-desc">Telaffuz sesinin çalınma hızını ayarlayın</div>
+                            </div>
+                            <div class="speech-chip-group" id="speedGroup">
+                                <button type="button" class="speech-chip" data-speed="0.8" onclick="setSpeed(0.8)">0.8x Yavaş</button>
+                                <button type="button" class="speech-chip active" data-speed="1.0" onclick="setSpeed(1.0)">1.0x Normal</button>
+                                <button type="button" class="speech-chip" data-speed="1.2" onclick="setSpeed(1.2)">1.2x Hızlı</button>
+                            </div>
+                        </div>
+
+                        <!-- Sesi Test Et -->
+                        <div class="settings-row">
+                            <div class="settings-row-info">
+                                <div class="settings-row-title">Sesi Test Et</div>
+                                <div class="settings-row-desc">Doğal telaffuzu dinleyerek test edin</div>
+                            </div>
+                            <button type="button" class="settings-action-btn" id="testVoiceBtn" onclick="testVoice()">
+                                <i class="fas fa-volume-up"></i> Sesi Dinle
+                            </button>
                         </div>
                     </div>
                 </div>

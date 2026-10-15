@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
             quizDailyLimit = await pywebview.api.get_quiz_limit();
         } catch { quizDailyLimit = 10; }
         applyQuizLimitUI();
+        // Load persisted pronunciation settings
+        const savedAccent = localStorage.getItem('lingua-accent') || 'us';
+        const savedSpeed  = parseFloat(localStorage.getItem('lingua-speed') || '1.0');
+        applyAccentUI(savedAccent);
+        applySpeedUI(savedSpeed);
     }
 
     // ── THEME ────────────────────────────────────────────────────
@@ -40,6 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('lingua-theme', theme);
         applyTheme(theme);
     };
+
+    // ── FORM PRONUNCIATION BUTTON ────────────────────────────────
+    const speakFormBtn = document.getElementById('speakFormBtn');
+    if (speakFormBtn) {
+        speakFormBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const eng = document.getElementById('english').value.trim();
+            if (eng) {
+                speakWord(eng, speakFormBtn);
+            } else {
+                showToast('Lütfen önce bir İngilizce kelime girin.', 'error');
+            }
+        });
+    }
 
     // ── AUTO-CAPITALIZE TRANSLATION ──────────────────────────────
     const translationInput = document.getElementById('translation');
@@ -227,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         const isPermanent = word.permanently_learned;
         card.className = `word-card${word.needs_review ? ' needs-review':''}${isPermanent ? ' permanently-learned':''}`;
+        card.dataset.id = word.id;
 
         let badge;
         if (isPermanent) {
@@ -258,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasTr = word.example_turkish && word.example_turkish.trim();
         const trSection = hasTr ? `
             <div class="tr-wrap">
-                <button class="btn-show-tr" onclick="toggleTurkish(this,'${escapeJs(word.example_turkish)}')">
+                <button class="btn-show-tr" data-action="toggle-tr">
                     <i class="fas fa-eye"></i> Türkçeyi Göster
                 </button>
                 <div class="tr-text" style="display:none;"></div>
@@ -267,24 +287,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const notesHtml = word.notes ? `<div class="word-notes"><i class="fas fa-sticky-note"></i> ${escapeHtml(word.notes)}</div>` : '';
 
         const reviewBtn = (word.needs_review && !isPermanent)
-            ? `<button class="icon-btn btn-review" onclick="reviewWord(${word.id})" title="Öğrendim"><i class="fas fa-check"></i></button>`
+            ? `<button class="icon-btn btn-review" data-action="review" title="Öğrendim"><i class="fas fa-check"></i></button>`
             : '';
+
+        const exampleAudioBtn = word.example ? `
+            <button class="icon-btn btn-speak-sm" data-action="speak-example" title="Örnek cümleyi dinle">
+                <i class="fas fa-volume-up"></i>
+            </button>` : '';
 
         card.innerHTML = `
             <div class="card-head">
                 <div class="card-badges">${badge}</div>
                 <div class="card-actions">
-                    <button class="icon-btn btn-speak" onclick="speakWord('${escapeJs(word.english)}')" title="Sesli oku"><i class="fas fa-volume-up"></i></button>
-                    <button class="icon-btn btn-edit"   onclick="editWord(${word.id})"   title="Düzenle"><i class="fas fa-pencil"></i></button>
+                    <button class="icon-btn btn-speak"  data-action="speak"  title="Sesli oku"><i class="fas fa-volume-up"></i></button>
+                    <button class="icon-btn btn-edit"   data-action="edit"   title="Düzenle"><i class="fas fa-pencil"></i></button>
                     ${reviewBtn}
-                    <button class="icon-btn btn-delete" onclick="deleteWord(${word.id})" title="Sil"><i class="fas fa-trash"></i></button>
+                    <button class="icon-btn btn-delete" data-action="delete" title="Sil"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="word-english">${escapeHtml(word.english)}</div>
                 <div class="word-turkish">${escapeHtml(word.translation)}</div>
             </div>
-            <div class="word-example">"${escapeHtml(word.example)}"</div>
+            <div class="word-example-row">
+                <div class="word-example">"${escapeHtml(word.example)}"</div>
+                ${exampleAudioBtn}
+            </div>
             ${trSection}
             ${notesHtml}
             <div class="card-foot">
@@ -299,9 +327,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = document.createElement('div');
         const isPermanent = word.permanently_learned;
         item.className = `list-item${word.needs_review ? ' needs-review':''}${isPermanent ? ' permanently-learned':''}`;
+        item.dataset.id = word.id;
 
         const reviewBtn = (word.needs_review && !isPermanent)
-            ? `<button class="icon-btn btn-review" onclick="reviewWord(${word.id})" title="Öğrendim"><i class="fas fa-check"></i></button>`
+            ? `<button class="icon-btn btn-review" data-action="review" title="Öğrendim"><i class="fas fa-check"></i></button>`
             : '';
 
         item.innerHTML = `
@@ -310,22 +339,243 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="word-turkish" style="font-size:13px;">${escapeHtml(word.translation)}</div>
             </div>
             <div class="list-item-right">
-                <button class="icon-btn btn-speak" onclick="speakWord('${escapeJs(word.english)}')" title="Sesli oku"><i class="fas fa-volume-up"></i></button>
-                <button class="icon-btn btn-edit"   onclick="editWord(${word.id})"   title="Düzenle"><i class="fas fa-pencil"></i></button>
+                <button class="icon-btn btn-speak"  data-action="speak"  title="Sesli oku"><i class="fas fa-volume-up"></i></button>
+                <button class="icon-btn btn-edit"   data-action="edit"   title="Düzenle"><i class="fas fa-pencil"></i></button>
                 ${reviewBtn}
-                <button class="icon-btn btn-delete" onclick="deleteWord(${word.id})" title="Sil"><i class="fas fa-trash"></i></button>
+                <button class="icon-btn btn-delete" data-action="delete" title="Sil"><i class="fas fa-trash"></i></button>
             </div>`;
         return item;
     }
 
-    // ── SPEECH ───────────────────────────────────────────────────
-    window.speakWord = function(text) {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'en-US';
-        utt.rate = 0.9;
-        window.speechSynthesis.speak(utt);
+    // ── CARD ACTIONS (event delegation) ──────────────────────────
+    // Kelime verisi HTML'e gömülmez; id üzerinden allWords'ten okunur.
+    document.getElementById('wordsGrid').addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const item = btn.closest('[data-id]');
+        const word = item && allWords.find(w => w.id === Number(item.dataset.id));
+        if (!word) return;
+
+        switch (btn.dataset.action) {
+            case 'speak':         speakWord(word.english, btn); break;
+            case 'speak-example': speakWord(word.example, btn); break;
+            case 'toggle-tr':     toggleTurkish(btn, word.example_turkish); break;
+            case 'edit':          editWord(word.id); break;
+            case 'review':        reviewWord(word.id); break;
+            case 'delete':        deleteWord(word.id); break;
+        }
+    });
+
+    // ── SPEECH & PRONUNCIATION ENGINE ─────────────────────────────
+    let activeAudio = null;
+    let activeResetFn = null;
+
+    window.getSpeechAccent = function() {
+        return localStorage.getItem('lingua-accent') || 'us';
+    };
+
+    window.getSpeechSpeed = function() {
+        return parseFloat(localStorage.getItem('lingua-speed') || '1.0');
+    };
+
+    function applyAccentUI(accent) {
+        document.querySelectorAll('#accentGroup .speech-chip').forEach(btn => {
+            btn.classList.toggle('active', btn.id === (accent === 'uk' ? 'accentUK' : 'accentUS'));
+        });
+    }
+
+    function applySpeedUI(speed) {
+        document.querySelectorAll('#speedGroup .speech-chip').forEach(btn => {
+            btn.classList.toggle('active', parseFloat(btn.dataset.speed) === speed);
+        });
+    }
+
+    window.setAccent = function(accent) {
+        localStorage.setItem('lingua-accent', accent);
+        applyAccentUI(accent);
+    };
+
+    window.setSpeed = function(speed) {
+        localStorage.setItem('lingua-speed', speed.toString());
+        applySpeedUI(speed);
+    };
+
+    window.testVoice = function() {
+        const testBtn = document.getElementById('testVoiceBtn');
+        const accent = window.getSpeechAccent();
+        const sampleText = accent === 'uk' ? 'Brilliant English vocabulary!' : 'Welcome to native English pronunciation!';
+        speakWord(sampleText, testBtn);
+    };
+
+    function getEnglishSpeechVoice(accent) {
+        if (!window.speechSynthesis) return null;
+        const voices = window.speechSynthesis.getVoices() || [];
+        if (!voices || voices.length === 0) return null;
+
+        const isUk = accent === 'uk';
+        const pref = isUk ? ['en-gb', 'en_gb', 'united kingdom', 'hazel', 'george', 'susan']
+                          : ['en-us', 'en_us', 'united states', 'zira', 'david', 'jenny', 'guy', 'aria', 'mark'];
+
+        // 1. Try preferred accent voice
+        let matched = voices.find(v => {
+            const lang = (v.lang || '').toLowerCase();
+            const name = (v.name || '').toLowerCase();
+            return pref.some(p => lang.includes(p) || name.includes(p));
+        });
+
+        // 2. Try any English voice
+        if (!matched) {
+            matched = voices.find(v => {
+                const lang = (v.lang || '').toLowerCase();
+                const name = (v.name || '').toLowerCase();
+                return lang.startsWith('en') || name.includes('english');
+            });
+        }
+
+        // Return matched ONLY if it's truly an English voice
+        return matched || null;
+    }
+
+    function playAudioUrl(url, speed) {
+        return new Promise((resolve, reject) => {
+            const audio = new Audio();
+            audio.crossOrigin = 'anonymous';
+            audio.src = url;
+            audio.playbackRate = speed;
+            activeAudio = audio;
+
+            let finished = false;
+            const done = (err) => {
+                if (finished) return;
+                finished = true;
+                if (activeAudio === audio) activeAudio = null;
+                if (err) reject(err);
+                else resolve();
+            };
+
+            audio.onended = () => done(null);
+            audio.onerror = (e) => done(e || new Error('Audio load error'));
+
+            // Safety timeout
+            const timer = setTimeout(() => {
+                if (!finished && audio.paused && audio.currentTime === 0) {
+                    done(new Error('Audio timeout'));
+                }
+            }, 6000);
+
+            audio.play().catch(err => {
+                clearTimeout(timer);
+                done(err);
+            });
+        });
+    }
+
+    async function playAudioPipeline(cleanText, accent, speed) {
+        const words = cleanText.split(/\s+/).filter(Boolean);
+        const isShort = words.length <= 6 && cleanText.length <= 60;
+        const youdaoType = accent === 'uk' ? 1 : 2;
+        const youdaoUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(cleanText)}&type=${youdaoType}`;
+        const googleLang = accent === 'uk' ? 'en-GB' : 'en-US';
+        const googleUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${googleLang}&client=tw-ob&q=${encodeURIComponent(cleanText)}`;
+
+        // Determine URL order based on length
+        const onlineUrls = isShort ? [youdaoUrl, googleUrl] : [googleUrl, youdaoUrl];
+
+        // 1. Try Online Native Audio
+        for (const url of onlineUrls) {
+            try {
+                await playAudioUrl(url, speed);
+                return;
+            } catch (e) {
+                // Try next url
+            }
+        }
+
+        // 2. Fallback to Web SpeechSynthesis (Strictly English Voice Only!)
+        const englishVoice = getEnglishSpeechVoice(accent);
+        if (englishVoice) {
+            return new Promise((resolve, reject) => {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utt = new SpeechSynthesisUtterance(cleanText);
+                    utt.voice = englishVoice;
+                    utt.lang = englishVoice.lang || (accent === 'uk' ? 'en-GB' : 'en-US');
+                    utt.rate = Math.max(0.6, Math.min(1.4, speed * 0.95));
+                    utt.onend = () => resolve();
+                    utt.onerror = () => reject();
+                    window.speechSynthesis.speak(utt);
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        }
+
+        // 3. Fallback to Python Backend Native SAPI (Desktop English Voice)
+        // If web SpeechSynthesis only has Turkish (like Tolga), we NEVER pass English to it!
+        if (window.pywebview && window.pywebview.api && window.pywebview.api.speak_offline) {
+            try {
+                await pywebview.api.speak_offline(cleanText, accent);
+                return;
+            } catch (e) {
+                console.warn('speak_offline failed:', e);
+            }
+        }
+
+        throw new Error('No English speech engine available');
+    }
+
+    window.speakWord = function(text, triggerEl) {
+        if (!text || typeof text !== 'string') return;
+        const cleanText = text.replace(/^["']|["']$/g, '').trim();
+        if (!cleanText) return;
+
+        // Reset previous playing button/audio
+        if (activeResetFn) {
+            activeResetFn();
+            activeResetFn = null;
+        }
+        if (activeAudio) {
+            try {
+                activeAudio.pause();
+                activeAudio.removeAttribute('src');
+                activeAudio.load();
+            } catch (e) {}
+            activeAudio = null;
+        }
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+
+        // Button visual feedback
+        let btn = triggerEl;
+        if (!btn && window.event && window.event.currentTarget) {
+            btn = window.event.currentTarget;
+        }
+
+        let resetBtn = () => {};
+        if (btn && btn.classList) {
+            btn.classList.add('speaking');
+            const icon = btn.querySelector('i');
+            const originalIconClass = icon ? icon.className : '';
+            if (icon) icon.className = 'fas fa-volume-high';
+
+            resetBtn = () => {
+                btn.classList.remove('speaking');
+                if (icon) icon.className = originalIconClass;
+                if (activeResetFn === resetBtn) activeResetFn = null;
+            };
+            activeResetFn = resetBtn;
+        }
+
+        const accent = window.getSpeechAccent();
+        const speed = window.getSpeechSpeed();
+
+        playAudioPipeline(cleanText, accent, speed)
+            .then(() => resetBtn())
+            .catch(() => {
+                resetBtn();
+                showToast('Telaffuz sesi çalınamadı. İnternet bağlantınızı kontrol edin.', 'error');
+            });
     };
 
     // ── TOGGLE TURKISH ───────────────────────────────────────────
@@ -443,7 +693,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await pywebview.api.delete_word(wordIdToDelete);
             showToast('Kelime silindi.');
             await loadWords();
-            await loadCategories();
         } catch (err) {
             console.error(err);
             showToast('Hata oluştu!', 'error');
@@ -475,11 +724,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/&/g,'&amp;').replace(/</g,'&lt;')
             .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
             .replace(/'/g,'&#039;');
-    }
-    function escapeJs(str) {
-        return String(str)
-            .replace(/\\/g,'\\\\').replace(/'/g,"\\'")
-            .replace(/"/g,'\\"').replace(/\n/g,'\\n');
     }
 
     // ── QUIZ ─────────────────────────────────────────────────────
@@ -697,7 +941,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await pywebview.api.import_words(data);
             showToast(`${result.imported} kelime içe aktarıldı, ${result.skipped} atlandı.`);
             await loadWords();
-            await loadCategories();
         } catch { showToast('İçe aktarma hatası. Geçerli bir JSON dosyası seçin.','error'); }
         e.target.value = '';
     });
@@ -770,6 +1013,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('quizTranslation').textContent = word.translation;
         document.getElementById('quizExample').textContent     = `"${word.example}"`;
 
+        const classicSpeakBtn = document.getElementById('quizClassicSpeakBtn');
+        if (classicSpeakBtn) {
+            classicSpeakBtn.onclick = (e) => {
+                e.stopPropagation();
+                speakWord(word.english, classicSpeakBtn);
+            };
+        }
+
         const trEl = document.getElementById('quizExampleTurkish');
         if (word.example_turkish && word.example_turkish.trim()) {
             trEl.textContent   = `"${word.example_turkish}"`;
@@ -791,6 +1042,15 @@ document.addEventListener('DOMContentLoaded', () => {
         quizActions.style.display   = 'none';
 
         document.getElementById('quizMultiEnglish').textContent = word.english;
+
+        const multiSpeakBtn = document.getElementById('quizMultiSpeakBtn');
+        if (multiSpeakBtn) {
+            multiSpeakBtn.onclick = (e) => {
+                e.stopPropagation();
+                speakWord(word.english, multiSpeakBtn);
+            };
+        }
+
         renderCorrectDots('quizMultiCorrectDots', word.quiz_correct_count||0);
 
         // Build 4 choices: correct + 3 random wrong
