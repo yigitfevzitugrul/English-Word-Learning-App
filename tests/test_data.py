@@ -70,6 +70,29 @@ class MigrationTests(TempDirTest):
         self.assertEqual(read(self.path('appdata', 'words.json')), [{'id': 'yeni'}])
         self.assertTrue(os.path.exists(self.path('exe', 'words.json')))   # dokunulmadı
 
+    def test_replaces_empty_new_data_and_keeps_it(self):
+        """Uygulama taşımadan önce açılıp boş liste oluşturduysa yine taşınır."""
+        write(self.path('exe', 'words.json'), [{'id': 1}])
+        write(self.path('exe', 'stats.json'), {'streak': 3})
+        write(self.path('appdata', 'words.json'), [])
+        write(self.path('appdata', 'stats.json'), {'streak': 0})
+
+        moved = main.migrate_legacy_data(self.path('appdata'), self.path('exe'))
+
+        self.assertEqual(moved, ['words.json', 'stats.json'])
+        self.assertEqual(read(self.path('appdata', 'words.json')), [{'id': 1}])
+        self.assertEqual(read(self.path('appdata', 'stats.json')), {'streak': 3})
+        self.assertEqual(read(self.path('appdata', 'words.json.onceki')), [])
+        self.assertEqual(read(self.path('appdata', 'stats.json.onceki')), {'streak': 0})
+
+    def test_unreadable_new_data_is_never_replaced(self):
+        write(self.path('exe', 'words.json'), [{'id': 1}])
+        os.makedirs(self.path('appdata'))
+        with open(self.path('appdata', 'words.json'), 'w', encoding='utf-8') as f:
+            f.write('{bozuk')
+        self.assertEqual(main.migrate_legacy_data(self.path('appdata'), self.path('exe')), [])
+        self.assertTrue(os.path.exists(self.path('exe', 'words.json')))
+
     def test_same_folder_is_noop(self):
         write(self.path('words.json'), [])
         self.assertEqual(main.migrate_legacy_data(self.root, self.root), [])

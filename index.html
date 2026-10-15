@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lingua – Kelime Öğrenme</title>
     <meta name="description" content="İngilizce kelime öğrenme uygulaması">
+    <script>
+        // app.js yüklenmeden önceki hatalar; app.js bunları lingua.log'a yazar
+        window.__linguaEarly = [];
+        window.addEventListener('error', function (e) {
+            if (!window.__linguaLogReady) window.__linguaEarly.push(e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno);
+        });
+    </script>
     <!-- Yazı tipi ve ikonlar uygulamayla birlikte gelir: internet yokken ya da
          yavaşken sayfa bunları beklemez (CDN'den yüklenince liste boş kalabiliyordu) -->
     <link rel="stylesheet" href="vendor/inter/inter.css">

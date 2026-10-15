@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── INIT ──────────────────────────────────────────────────────────
     async function init() {
         await loadWords();
+        clientLog('info', `liste gösterildi: ${allWords.length} kelime, ` +
+                          `${document.querySelectorAll('.word-card, .list-item').length} kart`);
         await loadStreak();
         // Load persisted quiz limit from backend
         try {
@@ -25,14 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch { quizDailyLimit = 10; }
         applyQuizLimitUI();
         // Load persisted pronunciation settings
-        const savedAccent = localStorage.getItem('lingua-accent') || 'us';
-        const savedSpeed  = parseFloat(localStorage.getItem('lingua-speed') || '1.0');
+        const savedAccent = storageGet('lingua-accent', 'us');
+        const savedSpeed  = parseFloat(storageGet('lingua-speed', '1.0'));
         applyAccentUI(savedAccent);
         applySpeedUI(savedSpeed);
     }
 
     // ── THEME ────────────────────────────────────────────────────
-    const savedTheme = localStorage.getItem('lingua-theme') || 'dark';
+    const savedTheme = storageGet('lingua-theme', 'dark');
     applyTheme(savedTheme);
 
     function applyTheme(theme) {
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.setTheme = function (theme) {
-        localStorage.setItem('lingua-theme', theme);
+        storageSet('lingua-theme', theme);
         applyTheme(theme);
     };
 
@@ -240,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderWords();
         } catch (err) {
             console.error(err);
+            clientLog('error', `kelimeler gösterilemedi: ${err && (err.stack || err.message || err)}`);
         }
     }
 
@@ -443,11 +446,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeResetFn = null;
 
     window.getSpeechAccent = function() {
-        return localStorage.getItem('lingua-accent') || 'us';
+        return storageGet('lingua-accent', 'us');
     };
 
     window.getSpeechSpeed = function() {
-        return parseFloat(localStorage.getItem('lingua-speed') || '1.0');
+        return parseFloat(storageGet('lingua-speed', '1.0'));
     };
 
     function applyAccentUI(accent) {
@@ -463,12 +466,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.setAccent = function(accent) {
-        localStorage.setItem('lingua-accent', accent);
+        storageSet('lingua-accent', accent);
         applyAccentUI(accent);
     };
 
     window.setSpeed = function(speed) {
-        localStorage.setItem('lingua-speed', speed.toString());
+        storageSet('lingua-speed', speed.toString());
         applySpeedUI(speed);
     };
 
@@ -807,15 +810,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g,'&#039;');
     }
 
-    // localStorage gizli pencerede ya da engelliyken hata verebilir
     function readPref(key, allowed, fallback) {
-        try {
-            const v = localStorage.getItem(key);
-            return allowed.includes(v) ? v : fallback;
-        } catch { return fallback; }
+        const v = storageGet(key, fallback);
+        return allowed.includes(v) ? v : fallback;
     }
     function savePref(key, value) {
-        try { localStorage.setItem(key, value); } catch {}
+        storageSet(key, value);
     }
 
     const POS_LABELS = {
@@ -1525,14 +1525,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── START ────────────────────────────────────────────────────
-    // Her şey tanımlandıktan sonra başlar. pywebview API'si bu noktadan önce
-    // hazır olmuşsa 'pywebviewready' bir daha gelmez; init yine tam bir kez çalışır.
+    // Her şey tanımlandıktan sonra başlar. 'pywebviewready' olayı kaçırılabilir
+    // (API bu noktadan önce hazırsa) ya da gecikebilir; bu yüzden API ayrıca
+    // yoklanır. init tam bir kez çalışır; API 15 sn içinde gelmezse ekranda
+    // açık bir hata gösterilir (boş liste yerine).
     let started = false;
-    function startOnce() {
+    const startWaitBegan = Date.now();
+    const startPoll = setInterval(() => {
+        if (apiReady()) startOnce('yoklama');
+        else if (Date.now() - startWaitBegan > 15000) {
+            clearInterval(startPoll);
+            showStartupError();
+        }
+    }, 250);
+
+    function startOnce(how) {
         if (started) return;
         started = true;
+        clearInterval(startPoll);
+        clientLog('info', `arayüz başlıyor (${how}, ${Math.round(performance.now())} ms)`);
         init();
     }
-    if (window.pywebview && window.pywebview.api && window.pywebview.api.get_words) startOnce();
-    else window.addEventListener('pywebviewready', startOnce);
+
+    function showStartupError() {
+        document.getElementById('wordsGrid').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-plug-circle-xmark"></i>
+                <p>Uygulamanın arka planına bağlanılamadı; kelimeler yüklenemedi.<br>
+                   Lütfen uygulamayı kapatıp yeniden açın. Sorun sürerse
+                   %APPDATA%\\Lingua\\lingua.log dosyasını paylaşın.</p>
+            </div>`;
+    }
+
+    window.addEventListener('pywebviewready', () => startOnce('pywebviewready'));
+    if (apiReady()) startOnce('hazırdı');
 });
+
+// ── SAFE STORAGE ─────────────────────────────────────────────────
+// WebView2 depolamayı engelleyebilir ("Tracking Prevention blocked access to
+// storage"); o zaman localStorage erişimi hata fırlatır. Tercihler isteğe
+// bağlıdır: hata kurulumu yarıda kesmemeli, varsayılan değer kullanılır.
+function storageGet(key, fallback) {
+    try {
+        const v = window.localStorage.getItem(key);
+        return v === null ? fallback : v;
+    } catch {
+        return fallback;
+    }
+}
+
+function storageSet(key, value) {
+    try { window.localStorage.setItem(key, value); } catch { /* tercih kaydedilemedi */ }
+}
+
+// ── LOGGING ──────────────────────────────────────────────────────
+// Başlangıç adımları ve hatalar lingua.log'a gider (konsolsuz exe'de tek iz).
+// API hazır olmadan gelen kayıtlar bekletilir.
+const pendingLogs = [];
+
+function apiReady() {
+    return !!(window.pywebview && window.pywebview.api && window.pywebview.api.log_client);
+}
+
+function clientLog(level, message) {
+    pendingLogs.push([level, String(message)]);
+    if (!apiReady()) return;
+    while (pendingLogs.length) {
+        const [lvl, msg] = pendingLogs.shift();
+        window.pywebview.api.log_client(lvl, msg).catch(() => {});
+    }
+}
+
+// Kurulum yarıda kesilse bile bekleyen kayıtlar API gelince gönderilir
+window.addEventListener('pywebviewready', () => clientLog('info', `pywebviewready (${Math.round(performance.now())} ms)`));
+const logFlushBegan = Date.now();
+const logFlush = setInterval(() => {
+    if (apiReady()) { clientLog('info', 'günlük bağlantısı hazır'); clearInterval(logFlush); }
+    else if (Date.now() - logFlushBegan > 30000) clearInterval(logFlush);
+}, 500);
+
+window.__linguaLogReady = true;   // bundan sonrasını aşağıdaki dinleyici yakalar
+(window.__linguaEarly || []).forEach(m => clientLog('error', m));
+window.addEventListener('error', e =>
+    clientLog('error', `${e.message} @ ${(e.filename || '').split('/').pop()}:${e.lineno}`));
+window.addEventListener('unhandledrejection', e =>
+    clientLog('error', `promise: ${e.reason && (e.reason.message || e.reason)}`));

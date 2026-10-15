@@ -9,8 +9,12 @@ import threading
 import shutil
 import tempfile
 import functools
+import logging
+import logging.handlers
 
 import srs
+
+log = logging.getLogger('lingua')
 
 def get_base_path():
     if getattr(sys, 'frozen', False):
@@ -77,13 +81,13 @@ def read_json_safe(path, default):
             stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
             corrupt = f'{path}.corrupt-{stamp}'
             os.replace(path, corrupt)
-            print(f'{os.path.basename(path)} bozuk ({e}); {corrupt} olarak saklandı.')
+            log.warning('%s bozuk (%s); %s olarak saklandı', os.path.basename(path), e, corrupt)
     if os.path.exists(backup):
         try:
             with open(backup, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             write_json_atomic(path, data)
-            print(f'{os.path.basename(path)} yedekten geri yüklendi.')
+            log.warning('%s yedekten geri yüklendi', os.path.basename(path))
             return data
         except (json.JSONDecodeError, UnicodeDecodeError):
             pass
@@ -92,18 +96,39 @@ def read_json_safe(path, default):
 
 
 # ── VERİ KLASÖRÜ VE YEDEKLER ─────────────────────────────────────
+def has_words(path):
+    """words.json en az bir kelime içeriyor mu? Okunamıyorsa (bozuk vb.)
+    gerçek veri olabilir diye True sayılır: taşıma onu asla ezmez."""
+    if not os.path.exists(path):
+        return False
+    try:
+        with open(path, encoding='utf-8') as f:
+            data = json.load(f)
+        return not isinstance(data, list) or len(data) > 0
+    except (OSError, ValueError):
+        return True
+
+
 def migrate_legacy_data(data_dir, legacy_dir):
-    """Eski sürümler veriyi exe'nin yanında tutuyordu. İlk açılışta yeni
-    klasöre kopyalar; eskiler silinmez, "*.tasindi" adıyla yerinde kalır.
-    Taşınan dosya adlarını döndürür."""
+    """Eski sürümler veriyi exe'nin yanında tutuyordu. Yeni klasörde henüz
+    kelime yoksa (hiç dosya yok ya da boş liste) words.json ve stats.json'u
+    oraya kopyalar. Yeni klasördeki boş dosyalar "*.onceki", eskiler
+    "*.tasindi" adıyla saklanır; hiçbir şey silinmez, kelimesi olan veri
+    asla ezilmez. Taşınan dosya adlarını döndürür."""
     if os.path.normcase(os.path.abspath(data_dir)) == os.path.normcase(os.path.abspath(legacy_dir)):
+        return []
+    if not os.path.exists(os.path.join(legacy_dir, 'words.json')):
+        return []
+    if has_words(os.path.join(data_dir, 'words.json')):
         return []
     os.makedirs(data_dir, exist_ok=True)
     moved = []
     for name in DATA_FILES:
         src, dst = os.path.join(legacy_dir, name), os.path.join(data_dir, name)
-        if not os.path.exists(src) or os.path.exists(dst):
+        if not os.path.exists(src):
             continue
+        if os.path.exists(dst):
+            os.replace(dst, dst + '.onceki')
         shutil.copy2(src, dst)
         if os.path.exists(src + '.bak') and not os.path.exists(dst + '.bak'):
             shutil.copy2(src + '.bak', dst + '.bak')
@@ -158,7 +183,11 @@ def locked(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         with self._lock:
-            return method(self, *args, **kwargs)
+            try:
+                return method(self, *args, **kwargs)
+            except Exception:
+                log.exception('API hatası: %s', method.__name__)
+                raise
     return wrapper
 
 
@@ -171,7 +200,7 @@ class Api:
             # Yükleme dosyaları değiştirmeden (ör. SRS taşıması) önce alınır
             weekly_backup(self._data_dir, datetime.date.today())
         except OSError as e:
-            print(f'Otomatik yedek alınamadı: {e}')
+            log.warning('Otomatik yedek alınamadı: %s', e)
         self._load_db()
         self._load_stats()
 
@@ -189,6 +218,15 @@ class Api:
     def backup_now(self):
         target = make_backup(self._data_dir, datetime.date.today())
         return os.path.basename(target) if target else None
+
+    def log_client(self, level, message):
+        """Arayüzdeki başlangıç adımlarını ve JavaScript hatalarını lingua.log'a yazar."""
+        text = str(message)[:2000]
+        if level == 'error':
+            log.error('[arayüz] %s', text)
+        else:
+            log.info('[arayüz] %s', text)
+        return True
 
     def open_data_folder(self):
         if sys.platform == 'win32':
@@ -566,9 +604,9 @@ class Api:
                     speaker.Voice = english_voice
                     speaker.Speak(text, 0)
                 else:
-                    print("Offline SAPI: No English voice found. Skipped to prevent Turkish accent fallback.")
+                    log.info('Çevrimdışı ses: İngilizce ses bulunamadı')
             except Exception as e:
-                print(f"speak_offline error: {e}")
+                log.warning('speak_offline hatası: %s', e)
             finally:
                 try:
                     pythoncom.CoUninitialize()
@@ -579,19 +617,38 @@ class Api:
         return True
 
 
+def setup_logging(data_dir):
+    """Konsolsuz exe'de hataları görebilmek için lingua.log (en fazla ~3 x 200 KB)."""
+    os.makedirs(data_dir, exist_ok=True)
+    handler = logging.handlers.RotatingFileHandler(
+        os.path.join(data_dir, 'lingua.log'), maxBytes=200_000, backupCount=2, encoding='utf-8')
+    handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
+
+
 if __name__ == '__main__':
-    if getattr(sys, 'frozen', False):
-        moved = migrate_legacy_data(DATA_DIR, os.path.dirname(sys.executable))
-        if moved:
-            print(f'Veri {DATA_DIR} klasörüne taşındı: {", ".join(moved)}')
-    api = Api()
-    window = webview.create_window(
-        'Lingua - Kelime Öğrenme',
-        INDEX_HTML,
-        js_api=api,
-        width=1200,
-        height=860,
-        min_size=(900, 650),
-        background_color='#0d0d1a'
-    )
-    webview.start(debug=False)
+    setup_logging(DATA_DIR)
+    log.info('Başlıyor (exe: %s, veri: %s)', getattr(sys, 'frozen', False), DATA_DIR)
+    try:
+        if getattr(sys, 'frozen', False):
+            moved = migrate_legacy_data(DATA_DIR, os.path.dirname(sys.executable))
+            if moved:
+                log.info('Veri %s klasörüne taşındı: %s', DATA_DIR, ', '.join(moved))
+        api = Api()
+        log.info('Veri yüklendi: %d kelime', len(api.words))
+        window = webview.create_window(
+            'Lingua - Kelime Öğrenme',
+            INDEX_HTML,
+            js_api=api,
+            width=1200,
+            height=860,
+            min_size=(900, 650),
+            background_color='#0d0d1a'
+        )
+        window.events.loaded += lambda: log.info('Sayfa yüklendi')
+        webview.start(debug=False)
+        log.info('Kapandı')
+    except Exception:
+        log.exception('Başlatma hatası')
+        raise
