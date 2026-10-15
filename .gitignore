@@ -5,3 +5,9 @@ __pycache__/
 *.json.bak
 *.json.corrupt-*
 .tmp-*.json
+
+# Kişisel veri ve derleme çıktıları
+/words.json
+/stats.json
+dist/
+build/
