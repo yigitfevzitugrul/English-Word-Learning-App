@@ -2,3 +2,12 @@ venv/
 __pycache__/
 *.pyc
 .env
+*.json.bak
+*.json.corrupt-*
+.tmp-*.json
+
+# Kişisel veri ve derleme çıktıları
+/words.json
+/stats.json
+dist/
+build/

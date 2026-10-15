@@ -5,6 +5,10 @@ import datetime
 import sys
 import csv
 import io
+import threading
+import shutil
+import tempfile
+import functools
 
 def get_base_path():
     if getattr(sys, 'frozen', False):
@@ -26,46 +30,91 @@ STATS_FILE = get_stats_path()
 INDEX_HTML = os.path.join(get_base_path(), 'index.html')
 
 
+# ── SAFE JSON I/O ────────────────────────────────────────────────
+def write_json_atomic(path, data):
+    """Önce geçici dosyaya yazar, sonra tek adımda yerine koyar.
+    Yazma yarıda kesilirse eski dosya sağlam kalır."""
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix='.tmp-', suffix='.json')
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def read_json_safe(path, default):
+    """Dosyayı okur. Bozuksa kenara kaydeder ve .bak yedeğinden kurtarır.
+    Başarılı okumada son sağlam hali .bak olarak saklar."""
+    backup = path + '.bak'
+    if os.path.exists(path):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            shutil.copy2(path, backup)
+            return data
+        except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+            corrupt = f'{path}.corrupt-{stamp}'
+            os.replace(path, corrupt)
+            print(f'{os.path.basename(path)} bozuk ({e}); {corrupt} olarak saklandı.')
+    if os.path.exists(backup):
+        try:
+            with open(backup, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            write_json_atomic(path, data)
+            print(f'{os.path.basename(path)} yedekten geri yüklendi.')
+            return data
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            pass
+    write_json_atomic(path, default)
+    return default
+
+
+def locked(method):
+    """pywebview API çağrılarını ayrı thread'lerde çalıştırır;
+    veriye aynı anda tek çağrının dokunmasını sağlar."""
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        with self._lock:
+            return method(self, *args, **kwargs)
+    return wrapper
+
+
 class Api:
     def __init__(self):
+        self._lock = threading.RLock()
         self._load_db()
         self._load_stats()
 
     # ── DB ──────────────────────────────────────────────────────
     def _load_db(self):
-        if not os.path.exists(DB_FILE):
-            with open(DB_FILE, 'w', encoding='utf-8') as f:
-                json.dump([], f)
-            self.words = []
-        else:
-            with open(DB_FILE, 'r', encoding='utf-8') as f:
-                self.words = json.load(f)
+        self.words = read_json_safe(DB_FILE, [])
 
     def _save_db(self):
-        with open(DB_FILE, 'w', encoding='utf-8') as f:
-            json.dump(self.words, f, indent=4, ensure_ascii=False)
+        write_json_atomic(DB_FILE, self.words)
 
     # ── STATS / STREAK ──────────────────────────────────────────
     def _load_stats(self):
-        if not os.path.exists(STATS_FILE):
-            self.stats = {
-                'streak': 0,
-                'last_active_date': None,
-                'daily_learned': {},   # "YYYY-MM-DD": count
-                'quiz_limit': 10,
-            }
+        self.stats = read_json_safe(STATS_FILE, {
+            'streak': 0,
+            'last_active_date': None,
+            'daily_learned': {},   # "YYYY-MM-DD": count
+            'quiz_limit': 10,
+        })
+        # Backward compatibility: add quiz_limit if missing
+        if 'quiz_limit' not in self.stats:
+            self.stats['quiz_limit'] = 10
             self._save_stats()
-        else:
-            with open(STATS_FILE, 'r', encoding='utf-8') as f:
-                self.stats = json.load(f)
-            # Backward compatibility: add quiz_limit if missing
-            if 'quiz_limit' not in self.stats:
-                self.stats['quiz_limit'] = 10
-                self._save_stats()
 
     def _save_stats(self):
-        with open(STATS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(self.stats, f, indent=4, ensure_ascii=False)
+        write_json_atomic(STATS_FILE, self.stats)
 
     def _ensure_fields(self, word):
         """Ensure backward-compatible fields exist on a word dict."""
@@ -76,6 +125,7 @@ class Api:
         word.setdefault('notes', '')
 
     # ── STREAK ──────────────────────────────────────────────────
+    @locked
     def get_streak(self):
         today = datetime.date.today().isoformat()
         last  = self.stats.get('last_active_date')
@@ -121,6 +171,7 @@ class Api:
         self._save_stats()
 
     # ── WORDS ────────────────────────────────────────────────────
+    @locked
     def get_words(self):
         now = datetime.datetime.now()
         for word in self.words:
@@ -135,6 +186,7 @@ class Api:
                 word['needs_review'] = False
         return self.words
 
+    @locked
     def add_word(self, english_word, translation, example_sentence,
                  example_turkish='', notes=''):
         new_word = {
@@ -154,6 +206,7 @@ class Api:
         self._save_db()
         return new_word
 
+    @locked
     def update_word(self, word_id, english_word, translation, example_sentence,
                     example_turkish='', notes=''):
         for word in self.words:
@@ -167,6 +220,7 @@ class Api:
         self._save_db()
         return True
 
+    @locked
     def review_word(self, word_id):
         for word in self.words:
             if word['id'] == word_id:
@@ -177,6 +231,7 @@ class Api:
         self._save_db()
         return True
 
+    @locked
     def delete_word(self, word_id):
         self.words = [w for w in self.words if w['id'] != word_id]
         self._save_db()
@@ -192,6 +247,7 @@ class Api:
             groups[group_idx].append(wid)
         return groups
 
+    @locked
     def get_quiz_info(self):
         day_names = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar']
         today_group = datetime.date.today().weekday()
@@ -205,16 +261,19 @@ class Api:
             'remaining':      remaining,
         }
 
+    @locked
     def get_quiz_limit(self):
         """Return the persisted quiz daily limit."""
         return self.stats.get('quiz_limit', 10)
 
+    @locked
     def set_quiz_limit(self, limit):
         """Persist the quiz daily limit to stats.json."""
         self.stats['quiz_limit'] = int(limit)
         self._save_stats()
         return True
 
+    @locked
     def get_quiz_words(self, limit=0):
         self._load_db()
         result = []
@@ -233,6 +292,7 @@ class Api:
             result = result[:limit]
         return result
 
+    @locked
     def get_all_words_for_quiz(self):
         """Return all non-permanently-learned words for multiple-choice options."""
         self._load_db()
@@ -243,6 +303,7 @@ class Api:
                 result.append(word)
         return result
 
+    @locked
     def record_quiz_answer(self, word_id, knew_it):
         permanently_learned_now = False
         new_count = 0
@@ -268,6 +329,7 @@ class Api:
         }
 
     # ── STATISTICS ───────────────────────────────────────────────
+    @locked
     def get_statistics(self):
         total      = len(self.words)
         learned    = sum(1 for w in self.words if not w.get('needs_review', True) or w.get('permanently_learned'))
@@ -302,10 +364,12 @@ class Api:
         }
 
     # ── IMPORT / EXPORT ────────────────────────────────────────────
+    @locked
     def export_words(self):
         """Return all words as a list for JSON export."""
         return self.words
 
+    @locked
     def import_words(self, words_list):
         """
         Import a list of word dicts. Skips duplicates by english name (case-insensitive).
@@ -339,6 +403,50 @@ class Api:
             imported += 1
         self._save_db()
         return {'imported': imported, 'skipped': skipped}
+
+    # ── SPEECH FALLBACK (OFFLINE) ──────────────────────────────────
+    def speak_offline(self, text, accent='us'):
+        """Offline speech fallback using Windows SAPI native English voice."""
+        def _speak():
+            try:
+                import pythoncom
+                import win32com.client
+                pythoncom.CoInitialize()
+                speaker = win32com.client.Dispatch("SAPI.SpVoice")
+                english_voice = None
+                pref = 'uk' if (accent or '').lower() == 'uk' else 'us'
+
+                for v in speaker.GetVoices():
+                    desc = v.GetDescription().lower()
+                    if pref == 'uk' and any(k in desc for k in ['united kingdom', 'hazel', 'george', 'susan', 'en-gb']):
+                        english_voice = v
+                        break
+                    elif pref == 'us' and any(k in desc for k in ['united states', 'zira', 'david', 'mark', 'eva', 'en-us']):
+                        english_voice = v
+                        break
+
+                if not english_voice:
+                    for v in speaker.GetVoices():
+                        desc = v.GetDescription().lower()
+                        if any(k in desc for k in ['english', 'zira', 'david', 'united states', 'united kingdom', 'en-']):
+                            english_voice = v
+                            break
+
+                if english_voice:
+                    speaker.Voice = english_voice
+                    speaker.Speak(text, 0)
+                else:
+                    print("Offline SAPI: No English voice found. Skipped to prevent Turkish accent fallback.")
+            except Exception as e:
+                print(f"speak_offline error: {e}")
+            finally:
+                try:
+                    pythoncom.CoUninitialize()
+                except Exception:
+                    pass
+
+        threading.Thread(target=_speak, daemon=True).start()
+        return True
 
 
 if __name__ == '__main__':
