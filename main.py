@@ -10,6 +10,8 @@ import shutil
 import tempfile
 import functools
 
+import srs
+
 def get_base_path():
     if getattr(sys, 'frozen', False):
         return sys._MEIPASS
@@ -96,6 +98,9 @@ class Api:
     # ── DB ──────────────────────────────────────────────────────
     def _load_db(self):
         self.words = read_json_safe(DB_FILE, [])
+        migrated = [self._ensure_fields(w) for w in self.words]
+        if any(migrated):
+            self._save_db()   # eski kayıtlar SRS alanlarıyla diske yazılır
 
     def _save_db(self):
         write_json_atomic(DB_FILE, self.words)
@@ -117,12 +122,54 @@ class Api:
         write_json_atomic(STATS_FILE, self.stats)
 
     def _ensure_fields(self, word):
-        """Ensure backward-compatible fields exist on a word dict."""
+        """Eksik alanları tamamlar. Eski ilerleme SRS'e taşındıysa True döner."""
         word.setdefault('example_turkish', '')
         word.setdefault('quiz_correct_count', 0)
         word.setdefault('quiz_wrong_count', 0)
         word.setdefault('permanently_learned', False)
         word.setdefault('notes', '')
+        if 'srs' not in word:
+            word['srs'] = srs.migrate_legacy(word, datetime.date.today())
+            self._refresh(word, datetime.date.today())
+            return True
+        return False
+
+    def _refresh(self, word, today):
+        """SRS durumundan türetilen alanları günceller."""
+        word['needs_review']        = srs.is_due(word['srs'], today)
+        word['permanently_learned'] = srs.is_mature(word['srs'])
+
+    def _new_word(self, word_id, english, translation, example,
+                  example_turkish='', notes=''):
+        return {
+            'id':                  word_id,
+            'english':             english,
+            'translation':         translation,
+            'example':             example,
+            'example_turkish':     example_turkish,
+            'notes':               notes,
+            'learned_at':          None,
+            'needs_review':        True,
+            'quiz_correct_count':  0,
+            'quiz_wrong_count':    0,
+            'permanently_learned': False,
+            'srs':                 srs.new_state(),
+        }
+
+    def _find(self, word_id):
+        return next((w for w in self.words if w['id'] == word_id), None)
+
+    def _grade(self, word, grade, today):
+        """Cevabı SRS'e işler. Kelime bu cevapla kalıcı olduysa True döner."""
+        was_mature = srs.is_mature(word['srs'])
+        word['srs'] = srs.schedule(word['srs'], grade, today)
+        if grade == 'again':
+            word['quiz_wrong_count'] += 1
+        else:
+            word['quiz_correct_count'] += 1
+            word['learned_at'] = datetime.datetime.now().isoformat()
+        self._refresh(word, today)
+        return word['permanently_learned'] and not was_mature
 
     # ── STREAK ──────────────────────────────────────────────────
     @locked
@@ -173,35 +220,17 @@ class Api:
     # ── WORDS ────────────────────────────────────────────────────
     @locked
     def get_words(self):
-        now = datetime.datetime.now()
+        today = datetime.date.today()
         for word in self.words:
-            self._ensure_fields(word)
-            if not word.get('learned_at'):
-                word['needs_review'] = True
-                continue
-            learned_time = datetime.datetime.fromisoformat(word['learned_at'])
-            if now >= learned_time + datetime.timedelta(hours=24):
-                word['needs_review'] = True
-            else:
-                word['needs_review'] = False
+            self._refresh(word, today)
         return self.words
 
     @locked
     def add_word(self, english_word, translation, example_sentence,
                  example_turkish='', notes=''):
-        new_word = {
-            'id': max((w['id'] for w in self.words), default=0) + 1,
-            'english':          english_word,
-            'translation':      translation,
-            'example':          example_sentence,
-            'example_turkish':  example_turkish,
-            'notes':            notes,
-            'learned_at':       None,
-            'needs_review':     True,
-            'quiz_correct_count': 0,
-            'quiz_wrong_count':   0,
-            'permanently_learned': False,
-        }
+        new_word = self._new_word(
+            max((w['id'] for w in self.words), default=0) + 1,
+            english_word, translation, example_sentence, example_turkish, notes)
         self.words.append(new_word)
         self._save_db()
         return new_word
@@ -222,13 +251,12 @@ class Api:
 
     @locked
     def review_word(self, word_id):
-        for word in self.words:
-            if word['id'] == word_id:
-                word['learned_at']  = datetime.datetime.now().isoformat()
-                word['needs_review'] = False
-                break
-        self._touch_streak()
-        self._save_db()
+        """Karttaki "Öğrendim" butonu: quizdeki "Bildim" ile aynı işlenir."""
+        word = self._find(word_id)
+        if word:
+            self._grade(word, 'good', datetime.date.today())
+            self._touch_streak()
+            self._save_db()
         return True
 
     @locked
@@ -238,27 +266,18 @@ class Api:
         return True
 
     # ── QUIZ ─────────────────────────────────────────────────────
-    def _build_groups(self):
-        all_ids = sorted(w['id'] for w in self.words)
-        n = len(all_ids)
-        groups = [[] for _ in range(7)]
-        for i, wid in enumerate(all_ids):
-            group_idx = min(int(i * 7 / n), 6) if n > 0 else 0
-            groups[group_idx].append(wid)
-        return groups
-
     @locked
     def get_quiz_info(self):
-        day_names = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar']
-        today_group = datetime.date.today().weekday()
-        total = len(self.words)
-        remaining = sum(1 for w in self.words if not w.get('permanently_learned', False))
+        today = datetime.date.today()
+        due      = [w for w in self.words if srs.is_due(w['srs'], today)]
+        new      = sum(1 for w in due if srs.is_new(w['srs']))
+        upcoming = sorted(w['srs']['due'] for w in self.words
+                          if not srs.is_due(w['srs'], today))
         return {
-            'group_number':   today_group + 1,
-            'day_name':       day_names[today_group],
-            'total_words':    total,
-            'words_in_group': remaining,
-            'remaining':      remaining,
+            'total_words': len(self.words),
+            'reviews':     len(due) - new,
+            'new':         new,
+            'next_due':    upcoming[0] if upcoming else None,
         }
 
     @locked
@@ -275,66 +294,53 @@ class Api:
 
     @locked
     def get_quiz_words(self, limit=0):
-        self._load_db()
-        result = []
-        for word in self.words:
-            if not word.get('permanently_learned', False):
-                self._ensure_fields(word)
-                result.append(word)
-        # Sort: needs_review first, then by wrong count (harder words first), then by id
-        result.sort(key=lambda w: (
-            0 if w.get('needs_review') else 1,
-            -(w.get('quiz_wrong_count') or 0),
-            w['id']
-        ))
-        # Apply daily limit (0 = unlimited)
+        """Bugün sorulacak kartlar: önce vadesi geçmiş tekrarlar, sonra yeni kelimeler.
+        Vadesi gelmemiş kelimeler sorulmaz. limit=0 sınırsız demektir."""
+        today = datetime.date.today()
+        due = [w for w in self.words if srs.is_due(w['srs'], today)]
+        reviews = sorted((w for w in due if not srs.is_new(w['srs'])),
+                         key=lambda w: (w['srs']['due'], -w['srs']['lapses'], w['id']))
+        new = sorted((w for w in due if srs.is_new(w['srs'])), key=lambda w: w['id'])
+        queue = reviews + new
         if limit and limit > 0:
-            result = result[:limit]
-        return result
+            queue = queue[:limit]
+        return [dict(w, preview=srs.preview(w['srs'], today)) for w in queue]
 
     @locked
     def get_all_words_for_quiz(self):
-        """Return all non-permanently-learned words for multiple-choice options."""
-        self._load_db()
-        result = []
-        for word in self.words:
-            if not word.get('permanently_learned', False):
-                self._ensure_fields(word)
-                result.append(word)
-        return result
+        """Çoktan seçmeli yanlış şıklar için tüm kelimeler."""
+        return self.words
 
     @locked
-    def record_quiz_answer(self, word_id, knew_it):
-        permanently_learned_now = False
-        new_count = 0
-        for word in self.words:
-            if word['id'] == word_id:
-                self._ensure_fields(word)
-                if knew_it:
-                    word['quiz_correct_count'] += 1
-                    word['learned_at']  = datetime.datetime.now().isoformat()
-                    word['needs_review'] = False
-                    if word['quiz_correct_count'] >= 4:
-                        word['permanently_learned'] = True
-                        permanently_learned_now = True
-                else:
-                    word['quiz_wrong_count'] = word.get('quiz_wrong_count', 0) + 1
-                new_count = word['quiz_correct_count']
-                break
+    def record_quiz_answer(self, word_id, grade):
+        """grade: 'again' | 'hard' | 'good' (eski istemciler için True/False da kabul edilir)."""
+        if grade is True:
+            grade = 'good'
+        elif grade is False:
+            grade = 'again'
+        word = self._find(word_id)
+        if word is None:
+            return None
+        today = datetime.date.today()
+        mastered_now = self._grade(word, grade, today)
         self._touch_streak()
         self._save_db()
         return {
-            'permanently_learned': permanently_learned_now,
-            'quiz_correct_count':  new_count,
+            'mastered_now': mastered_now,
+            'needs_review': word['needs_review'],
+            'srs':          word['srs'],
+            'preview':      srs.preview(word['srs'], today),
         }
 
     # ── STATISTICS ───────────────────────────────────────────────
     @locked
     def get_statistics(self):
+        today      = datetime.date.today()
         total      = len(self.words)
-        learned    = sum(1 for w in self.words if not w.get('needs_review', True) or w.get('permanently_learned'))
-        permanent  = sum(1 for w in self.words if w.get('permanently_learned'))
-        review     = sum(1 for w in self.words if w.get('needs_review') and not w.get('permanently_learned'))
+        learned    = sum(1 for w in self.words if w['srs']['reps'] > 0)
+        permanent  = sum(1 for w in self.words if srs.is_mature(w['srs']))
+        review     = sum(1 for w in self.words
+                         if srs.is_due(w['srs'], today) and not srs.is_new(w['srs']))
 
         # Most wrong words (top 5)
         sorted_wrong = sorted(
@@ -385,19 +391,12 @@ class Api:
                 skipped += 1
                 continue
             max_id += 1
-            new_word = {
-                'id':               max_id,
-                'english':          eng,
-                'translation':      str(item.get('translation', '')).strip(),
-                'example':          str(item.get('example', '')).strip(),
-                'example_turkish':  str(item.get('example_turkish', '')).strip(),
-                'notes':            str(item.get('notes', '')).strip(),
-                'learned_at':       None,
-                'needs_review':     True,
-                'quiz_correct_count': 0,
-                'quiz_wrong_count':   0,
-                'permanently_learned': False,
-            }
+            new_word = self._new_word(
+                max_id, eng,
+                str(item.get('translation', '')).strip(),
+                str(item.get('example', '')).strip(),
+                str(item.get('example_turkish', '')).strip(),
+                str(item.get('notes', '')).strip())
             self.words.append(new_word)
             existing.add(eng.lower())
             imported += 1
