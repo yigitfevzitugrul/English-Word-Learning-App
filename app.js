@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let searchQuery    = '';
     let currentSort    = 'default';
     let currentView    = 'grid';   // 'grid' | 'list'
-    let quizMode       = 'classic'; // 'classic' | 'multi'
+    let quizMode       = readPref('lingua-quiz-mode', ['classic', 'multi', 'type'], 'classic');
+    let quizDir        = readPref('lingua-quiz-dir', ['en-tr', 'tr-en'], 'en-tr');
     let quizDailyLimit = 10; // will be loaded from backend in init()
 
     // ── INIT ──────────────────────────────────────────────────────────
@@ -718,6 +719,25 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g,'&#039;');
     }
 
+    // localStorage gizli pencerede ya da engelliyken hata verebilir
+    function readPref(key, allowed, fallback) {
+        try {
+            const v = localStorage.getItem(key);
+            return allowed.includes(v) ? v : fallback;
+        } catch { return fallback; }
+    }
+    function savePref(key, value) {
+        try { localStorage.setItem(key, value); } catch {}
+    }
+
+    const POS_LABELS = {
+        noun: 'isim', verb: 'fiil', adjective: 'sıfat', adverb: 'zarf', pronoun: 'zamir',
+        preposition: 'edat', conjunction: 'bağlaç', interjection: 'ünlem', determiner: 'belirleyici',
+    };
+    function posLabel(pos) {
+        return POS_LABELS[pos] || pos;
+    }
+
     // ── SRS FORMAT HELPERS ───────────────────────────────────────
     function formatInterval(days) {
         if (days <= 0)  return 'Bugün';
@@ -752,14 +772,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizHiddenPart = document.getElementById('quizHiddenPart');
     const quizActions    = document.getElementById('quizActions');
     const quizHint       = document.getElementById('quizHint');
+    const quizTypeCard   = document.getElementById('quizTypeCard');
+
+    function applyQuizToggleUI() {
+        document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === quizMode));
+        document.querySelectorAll('[data-dir]').forEach(b => b.classList.toggle('active', b.dataset.dir === quizDir));
+    }
+    applyQuizToggleUI();
+
+    // Kaldığı karttan devam eder; cevaplanmış kartlar yeniden sorulmaz
+    function rerenderCurrentCard() {
+        if (quizContent.style.display !== 'none') showQuizCard();
+    }
 
     window.setQuizMode = function(mode) {
         quizMode = mode;
-        document.getElementById('quizModeClassic').classList.toggle('active', mode==='classic');
-        document.getElementById('quizModeMulti').classList.toggle('active', mode==='multi');
-        // Kaldığı karttan devam eder; cevaplanmış kartlar yeniden sorulmaz
-        if (quizContent.style.display !== 'none') showQuizCard();
+        savePref('lingua-quiz-mode', mode);
+        applyQuizToggleUI();
+        rerenderCurrentCard();
     };
+
+    window.setQuizDirection = function(dir) {
+        quizDir = dir;
+        savePref('lingua-quiz-dir', dir);
+        applyQuizToggleUI();
+        rerenderCurrentCard();
+    };
+
+    document.querySelector('.quiz-toggles').addEventListener('click', e => {
+        const btn = e.target.closest('[data-mode], [data-dir]');
+        if (!btn) return;
+        btn.blur();   // Space/Enter kısayolları butona tekrar basmasın
+        if (btn.dataset.mode) setQuizMode(btn.dataset.mode);
+        else setQuizDirection(btn.dataset.dir);
+    });
 
     document.getElementById('toggleQuizBtn').addEventListener('click', () => {
         mainContent.style.display  = 'none';
@@ -1019,6 +1065,49 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(containerId).textContent = text;
     }
 
+    // Soru yönüne göre kartın soru ve cevap tarafı
+    function sides(word) {
+        return quizDir === 'tr-en'
+            ? { prompt: word.translation, answer: word.english,     answerLang: 'en' }
+            : { prompt: word.english,     answer: word.translation, answerLang: 'tr' };
+    }
+
+    // Sözlük bilgisi: "/ˈreə.li/ · zarf · tanım — eş anlamlı: seldom, hardly"
+    function detailsText(word) {
+        const parts = [];
+        if (word.phonetic)       parts.push(word.phonetic);
+        if (word.part_of_speech) parts.push(posLabel(word.part_of_speech));
+        if (word.definition)     parts.push(word.definition);
+        let text = parts.join(' · ');
+        if (word.synonyms && word.synonyms.length) {
+            text += `${text ? ' — ' : ''}eş anlamlı: ${word.synonyms.join(', ')}`;
+        }
+        return text;
+    }
+
+    function showExample(elId, word) {
+        const el = document.getElementById(elId);
+        el.textContent   = word.example ? `"${word.example}"` : '';
+        el.style.display = word.example ? 'block' : 'none';
+    }
+
+    // Telaffuz butonu her zaman İngilizceyi okur. Tr → İng yönünde
+    // cevap görünene kadar gizlenir, yoksa cevabı söylemiş olur.
+    function bindSpeak(btnId, word, visible) {
+        const btn = document.getElementById(btnId);
+        btn.style.visibility = visible ? 'visible' : 'hidden';
+        btn.onclick = e => { e.stopPropagation(); speakWord(word.english, btn); };
+    }
+    function revealSpeak(btnId) {
+        document.getElementById(btnId).style.visibility = 'visible';
+    }
+
+    const SHORTCUTS = {
+        classic: '<kbd>Space</kbd> çevir · <kbd>1</kbd> Bilmedim · <kbd>2</kbd> Zor · <kbd>3</kbd> Bildim · <kbd>Esc</kbd> çık',
+        multi:   '<kbd>1</kbd>–<kbd>4</kbd> şık seç · <kbd>Esc</kbd> çık',
+        type:    '<kbd>Enter</kbd> kontrol et / devam · <kbd>Esc</kbd> çık',
+    };
+
     function showQuizCard() {
         if (currentQuizIndex >= quizWords.length) {
             finishQuiz();
@@ -1026,30 +1115,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const word = quizWords[currentQuizIndex];
         document.getElementById('quizProgress').textContent = `${currentQuizIndex+1} / ${quizWords.length}`;
+        document.getElementById('quizShortcuts').innerHTML = SHORTCUTS[quizMode];
 
-        if (quizMode === 'multi') {
-            showMultiChoiceCard(word);
-        } else {
-            showClassicCard(word);
-        }
-    }
-
-    function showClassicCard(word) {
-        quizCard.style.display      = 'flex';
-        quizMultiCard.style.display = 'none';
+        quizCard.style.display      = quizMode === 'classic' ? 'flex' : 'none';
+        quizMultiCard.style.display = quizMode === 'multi'   ? 'flex' : 'none';
+        quizTypeCard.style.display  = quizMode === 'type'    ? 'flex' : 'none';
         quizActions.style.display   = 'none';
 
-        document.getElementById('quizEnglish').textContent     = word.english;
-        document.getElementById('quizTranslation').textContent = word.translation;
-        document.getElementById('quizExample').textContent     = `"${word.example}"`;
+        if (quizMode === 'multi')     showMultiChoiceCard(word);
+        else if (quizMode === 'type') showTypeCard(word);
+        else                          showClassicCard(word);
+    }
 
-        const classicSpeakBtn = document.getElementById('quizClassicSpeakBtn');
-        if (classicSpeakBtn) {
-            classicSpeakBtn.onclick = (e) => {
-                e.stopPropagation();
-                speakWord(word.english, classicSpeakBtn);
-            };
-        }
+    // ── Klasik ──
+    function showClassicCard(word) {
+        const { prompt, answer } = sides(word);
+        const trEn = quizDir === 'tr-en';
+
+        document.getElementById('quizClassicLabel').textContent = trEn ? 'Türkçe anlam' : 'İngilizce kelime';
+        document.getElementById('quizEnglish').textContent      = prompt;
+        document.getElementById('quizTranslation').textContent  = answer;
+        document.getElementById('quizDetails').textContent      = detailsText(word);
+        showExample('quizExample', word);
+        bindSpeak('quizClassicSpeakBtn', word, !trEn);
 
         const trEl = document.getElementById('quizExampleTurkish');
         if (word.example_turkish && word.example_turkish.trim()) {
@@ -1067,35 +1155,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderSrsInfo('quizSrsInfo', word);
         quizHiddenPart.style.display = 'none';
-        quizActions.style.display    = 'none';
         quizHint.style.display       = 'block';
     }
 
+    function revealClassic() {
+        if (quizHiddenPart.style.display !== 'none') return;
+        quizHiddenPart.style.display = 'flex';
+        quizActions.style.display    = 'flex';
+        quizHint.style.display       = 'none';
+        revealSpeak('quizClassicSpeakBtn');
+    }
+
+    quizCard.addEventListener('click', revealClassic);
+
+    quizActions.addEventListener('click', e => {
+        const btn = e.target.closest('[data-grade]');
+        if (btn) handleQuizAnswer(btn.dataset.grade);
+    });
+
+    // ── Çoktan seçmeli ──
     function showMultiChoiceCard(word) {
-        quizCard.style.display      = 'none';
-        quizMultiCard.style.display = 'flex';
-        quizActions.style.display   = 'none';
+        const { prompt } = sides(word);
+        const trEn = quizDir === 'tr-en';
 
-        document.getElementById('quizMultiEnglish').textContent = word.english;
-
-        const multiSpeakBtn = document.getElementById('quizMultiSpeakBtn');
-        if (multiSpeakBtn) {
-            multiSpeakBtn.onclick = (e) => {
-                e.stopPropagation();
-                speakWord(word.english, multiSpeakBtn);
-            };
-        }
-
+        document.getElementById('quizMultiLabel').textContent = trEn
+            ? 'Bu anlamın İngilizcesi hangisi?'
+            : 'Bu kelimenin Türkçe anlamı nedir?';
+        document.getElementById('quizMultiEnglish').textContent = prompt;
+        bindSpeak('quizMultiSpeakBtn', word, !trEn);
         renderSrsInfo('quizMultiSrsInfo', word);
 
-        // Build 4 choices: correct + 3 random wrong
-        const choices = buildChoices(word);
         const choicesEl = document.getElementById('quizMultiChoices');
         choicesEl.innerHTML = '';
-        choices.forEach(choice => {
+        buildChoices(word).forEach((choice, i) => {
             const btn = document.createElement('button');
             btn.className = 'quiz-choice-btn';
-            btn.textContent = choice.translation;
+            btn.textContent = `${i + 1}. ${choice.text}`;
             btn.dataset.correct = choice.isCorrect ? '1' : '';
             btn.addEventListener('click', () => handleMultiChoice(choice.isCorrect, choicesEl, btn));
             choicesEl.appendChild(btn);
@@ -1103,29 +1198,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buildChoices(currentWord) {
+        const field = quizDir === 'tr-en' ? 'english' : 'translation';
         // Aynı anlamı taşıyan şıklar tekrar etmesin
         const norm = s => (s || '').trim().toLocaleLowerCase('tr-TR');
-        const seen = new Set([norm(currentWord.translation)]);
+        const seen = new Set([norm(currentWord[field])]);
         const others = allQuizWords
             .filter(w => w.id !== currentWord.id)
             .sort(() => Math.random() - 0.5)
             .filter(w => {
-                const key = norm(w.translation);
+                const key = norm(w[field]);
                 if (!key || seen.has(key)) return false;
                 seen.add(key);
                 return true;
             })
             .slice(0, 3);
-        const choices = [
-            {translation: currentWord.translation, isCorrect: true},
-            ...others.map(w => ({translation: w.translation, isCorrect: false}))
+        return [
+            {text: currentWord[field], isCorrect: true},
+            ...others.map(w => ({text: w[field], isCorrect: false}))
         ].sort(() => Math.random() - 0.5);
-        return choices;
     }
 
     async function handleMultiChoice(isCorrect, choicesEl, clickedBtn) {
+        if (clickedBtn.disabled) return;
         choicesEl.querySelectorAll('.quiz-choice-btn').forEach(b => b.disabled = true);
         clickedBtn.classList.add(isCorrect ? 'correct' : 'wrong');
+        revealSpeak('quizMultiSpeakBtn');
 
         if (!isCorrect) {
             choicesEl.querySelectorAll('.quiz-choice-btn[data-correct="1"]')
@@ -1139,17 +1236,103 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 900);
     }
 
-    quizCard.addEventListener('click', () => {
-        if (quizHiddenPart.style.display === 'none') {
-            quizHiddenPart.style.display = 'flex';
-            quizActions.style.display    = 'flex';
-            quizHint.style.display       = 'none';
-        }
-    });
+    // ── Yazarak ──
+    let typeState = null;   // kontrol edildikten sonra { grade } olur
 
-    quizActions.addEventListener('click', e => {
-        const btn = e.target.closest('[data-grade]');
-        if (btn) handleQuizAnswer(btn.dataset.grade);
+    function showTypeCard(word) {
+        const { prompt } = sides(word);
+        const trEn = quizDir === 'tr-en';
+        typeState = null;
+
+        document.getElementById('quizTypeLabel').textContent  = trEn ? 'İngilizcesini yaz' : 'Türkçe anlamını yaz';
+        document.getElementById('quizTypePrompt').textContent = prompt;
+        bindSpeak('quizTypeSpeakBtn', word, !trEn);
+        renderSrsInfo('quizTypeSrsInfo', word);
+
+        const input = document.getElementById('quizTypeInput');
+        input.value       = '';
+        input.readOnly    = false;
+        input.className   = 'quiz-type-input';
+        input.placeholder = trEn ? 'İngilizce kelimeyi yaz...' : 'Türkçe anlamını yaz...';
+        document.getElementById('quizTypeCheckBtn').style.display = '';
+        document.getElementById('quizTypeResult').style.display   = 'none';
+        setTimeout(() => input.focus(), 0);
+    }
+
+    function checkTyped() {
+        if (typeState) return;
+        const word  = quizWords[currentQuizIndex];
+        const input = document.getElementById('quizTypeInput');
+        const { answer, answerLang } = sides(word);
+        const { result, accentOnly } = LinguaAnswer.checkAnswer(input.value, answer, answerLang);
+        typeState = { grade: { correct: 'good', close: 'hard', wrong: 'again' }[result] };
+
+        // disabled yerine readOnly: odak kutuda kalır, ikinci Enter "Devam" olur
+        input.readOnly = true;
+        input.classList.add(result);
+        document.getElementById('quizTypeCheckBtn').style.display = 'none';
+
+        const answerHtml = `<strong>${escapeHtml(answer)}</strong>`;
+        const verdict = document.getElementById('quizTypeVerdict');
+        verdict.className = `quiz-type-verdict ${result}`;
+        verdict.innerHTML =
+              result === 'correct' ? (accentOnly ? `✓ Doğru! Yazımı: ${answerHtml}` : '✓ Doğru!')
+            : result === 'close'   ? `≈ Neredeyse! Doğru yazımı: ${answerHtml}`
+            :                        `✗ Doğrusu: ${answerHtml}`;
+
+        document.getElementById('quizTypeDetails').textContent = detailsText(word);
+        showExample('quizTypeExample', word);
+        // Eş anlamlı bir cevap yazdıysan doğru sayabilirsin
+        document.getElementById('quizTypeOverrideBtn').style.display = result === 'correct' ? 'none' : '';
+        document.getElementById('quizTypeResult').style.display = 'flex';
+        revealSpeak('quizTypeSpeakBtn');
+    }
+
+    function continueTyped(grade) {
+        if (!typeState) return;
+        const g = grade || typeState.grade;
+        typeState = null;   // çift basmayı engeller
+        handleQuizAnswer(g);
+    }
+
+    // Enter: önce kontrol eder, sonucu gösterdikten sonra bir sonraki karta geçer
+    document.getElementById('quizTypeForm').addEventListener('submit', e => {
+        e.preventDefault();
+        if (typeState) continueTyped();
+        else checkTyped();
+    });
+    document.getElementById('quizTypeNextBtn').addEventListener('click', () => continueTyped());
+    document.getElementById('quizTypeOverrideBtn').addEventListener('click', () => continueTyped('good'));
+
+    // ── Klavye kısayolları ──
+    document.addEventListener('keydown', e => {
+        if (quizSection.style.display === 'none') return;
+        if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            document.getElementById('exitQuizBtn').click();
+            return;
+        }
+        if (quizContent.style.display === 'none') return;
+        if (e.target.matches('input, textarea')) return;   // yazma alanında Enter formu gönderir
+
+        let handled = true;
+        if (quizMode === 'classic') {
+            if (e.key === ' ' || e.key === 'Enter') revealClassic();
+            else if (/^[123]$/.test(e.key) && quizHiddenPart.style.display !== 'none') {
+                handleQuizAnswer(['again', 'hard', 'good'][Number(e.key) - 1]);
+            } else handled = false;
+        } else if (quizMode === 'multi') {
+            const btn = document.querySelectorAll('#quizMultiChoices .quiz-choice-btn')[Number(e.key) - 1];
+            if (/^[1-4]$/.test(e.key) && btn) btn.click();
+            else handled = false;
+        } else if (quizMode === 'type') {
+            // Odak yazı kutusunun dışındaysa (ör. butona tıklandıysa) Enter yine devam eder
+            if (e.key === 'Enter' && typeState) continueTyped();
+            else handled = false;
+        }
+        if (handled) e.preventDefault();
     });
 
     let answering = false;

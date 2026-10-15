@@ -179,13 +179,22 @@
             <div id="quizContent" class="quiz-inner">
                 <div class="quiz-top">
                     <h2>Quiz Modu</h2>
-                    <div class="quiz-mode-toggle">
-                        <button class="quiz-mode-btn active" id="quizModeClassic" onclick="setQuizMode('classic')">
-                            <i class="fas fa-hand-point-up"></i> Klasik
-                        </button>
-                        <button class="quiz-mode-btn" id="quizModeMulti" onclick="setQuizMode('multi')">
-                            <i class="fas fa-list-ol"></i> Çoktan Seçmeli
-                        </button>
+                    <div class="quiz-toggles">
+                        <div class="quiz-mode-toggle">
+                            <button class="quiz-mode-btn active" id="quizModeClassic" data-mode="classic">
+                                <i class="fas fa-hand-point-up"></i> Klasik
+                            </button>
+                            <button class="quiz-mode-btn" id="quizModeMulti" data-mode="multi">
+                                <i class="fas fa-list-ol"></i> Çoktan Seçmeli
+                            </button>
+                            <button class="quiz-mode-btn" id="quizModeType" data-mode="type">
+                                <i class="fas fa-keyboard"></i> Yazarak
+                            </button>
+                        </div>
+                        <div class="quiz-mode-toggle" title="Soru yönü">
+                            <button class="quiz-mode-btn active" data-dir="en-tr">İng → Tr</button>
+                            <button class="quiz-mode-btn" data-dir="tr-en">Tr → İng</button>
+                        </div>
                     </div>
                     <span id="quizProgress" class="quiz-prog"></span>
                 </div>
@@ -200,7 +209,7 @@
 
                 <!-- Classic quiz card -->
                 <div id="quizCard" class="quiz-card">
-                    <span class="quiz-label">Kelime</span>
+                    <span class="quiz-label" id="quizClassicLabel">Kelime</span>
                     <div class="quiz-word-wrap">
                         <h3 id="quizEnglish" class="quiz-word">—</h3>
                         <button type="button" class="icon-btn btn-speak quiz-speak-btn" id="quizClassicSpeakBtn" title="Telaffuzu Dinle">
@@ -212,17 +221,18 @@
 
                     <div id="quizHiddenPart" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
                         <p id="quizTranslation" class="quiz-translation"></p>
+                        <p id="quizDetails" class="quiz-details"></p>
                         <p id="quizExample" class="quiz-example"></p>
                         <p id="quizExampleTurkish" class="quiz-example-turkish"></p>
                     </div>
                     <p id="quizHint" class="quiz-hint">
-                        <i class="fas fa-hand-pointer"></i> Çeviriyi görmek için tıkla
+                        <i class="fas fa-hand-pointer"></i> Cevabı görmek için tıkla
                     </p>
                 </div>
 
                 <!-- Multiple-choice quiz card -->
                 <div id="quizMultiCard" class="quiz-card" style="display:none;">
-                    <span class="quiz-label">Bu kelimenin Türkçe anlamı nedir?</span>
+                    <span class="quiz-label" id="quizMultiLabel">Bu kelimenin Türkçe anlamı nedir?</span>
                     <div class="quiz-word-wrap">
                         <h3 id="quizMultiEnglish" class="quiz-word">—</h3>
                         <button type="button" class="icon-btn btn-speak quiz-speak-btn" id="quizMultiSpeakBtn" title="Telaffuzu Dinle">
@@ -231,6 +241,36 @@
                     </div>
                     <div id="quizMultiSrsInfo" class="quiz-srs-info"></div>
                     <div id="quizMultiChoices" class="quiz-choices"></div>
+                </div>
+
+                <!-- Typing quiz card -->
+                <div id="quizTypeCard" class="quiz-card" style="display:none;">
+                    <span class="quiz-label" id="quizTypeLabel">Türkçe anlamını yaz</span>
+                    <div class="quiz-word-wrap">
+                        <h3 id="quizTypePrompt" class="quiz-word">—</h3>
+                        <button type="button" class="icon-btn btn-speak quiz-speak-btn" id="quizTypeSpeakBtn" title="Telaffuzu Dinle">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <div id="quizTypeSrsInfo" class="quiz-srs-info"></div>
+                    <form id="quizTypeForm" class="quiz-type-form" autocomplete="off">
+                        <input type="text" id="quizTypeInput" class="quiz-type-input"
+                               spellcheck="false" placeholder="Cevabını yaz, Enter'a bas">
+                        <button type="submit" class="quiz-btn right" id="quizTypeCheckBtn">Kontrol Et</button>
+                    </form>
+                    <div id="quizTypeResult" class="quiz-type-result" style="display:none;">
+                        <p id="quizTypeVerdict" class="quiz-type-verdict"></p>
+                        <p id="quizTypeDetails" class="quiz-details"></p>
+                        <p id="quizTypeExample" class="quiz-example"></p>
+                        <div class="quiz-type-buttons">
+                            <button type="button" class="quiz-btn hard" id="quizTypeOverrideBtn">
+                                <span><i class="fas fa-check"></i> Doğru say</span>
+                            </button>
+                            <button type="button" class="quiz-btn right" id="quizTypeNextBtn">
+                                <span>Devam <i class="fas fa-arrow-right"></i></span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="quizActions" class="quiz-actions" style="display:none;">
@@ -247,6 +287,8 @@
                         <span class="quiz-btn-hint" data-hint="good"></span>
                     </button>
                 </div>
+
+                <p id="quizShortcuts" class="quiz-shortcuts"></p>
             </div>
 
             <div id="quizEmpty" class="quiz-empty" style="display:none;">
@@ -492,6 +534,7 @@
     </div>
 </div>
 
+<script src="answer.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
