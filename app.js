@@ -942,6 +942,37 @@ document.addEventListener('DOMContentLoaded', () => {
         quizSection.style.display  = 'none';
         document.getElementById('statsPage').style.display = 'none';
         settingsPage.style.display = 'flex';
+        loadDataInfo();
+    });
+
+    // ── DATA FOLDER / BACKUPS ────────────────────────────────────
+    async function loadDataInfo() {
+        try {
+            const info = await pywebview.api.get_data_info();
+            document.getElementById('dataDirPath').textContent = info.data_dir;
+            const last = info.last_backup
+                ? new Date(info.last_backup + 'T00:00').toLocaleDateString('tr-TR', {day: 'numeric', month: 'long', year: 'numeric'})
+                : 'henüz yok';
+            document.getElementById('backupInfo').textContent =
+                `Haftada bir otomatik yedek alınır, son 8 yedek saklanır. Son yedek: ${last} (${info.backup_count} yedek).`;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    document.getElementById('openDataDirBtn').addEventListener('click', () => {
+        pywebview.api.open_data_folder().catch(err => console.error(err));
+    });
+
+    document.getElementById('backupNowBtn').addEventListener('click', async () => {
+        try {
+            const name = await pywebview.api.backup_now();
+            showToast(name ? 'Yedek alındı.' : 'Yedeklenecek veri yok.', name ? 'success' : 'error');
+            await loadDataInfo();
+        } catch (err) {
+            console.error(err);
+            showToast('Yedek alınamadı!', 'error');
+        }
     });
 
     closeSettingsBtn.addEventListener('click', () => {

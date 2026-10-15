@@ -215,6 +215,8 @@ body {
 .dict-info-clear:hover { color:var(--red); }
 .dict-status { font-size:11px; color:var(--text-3); }
 
+.settings-path { word-break:break-all; font-family:ui-monospace, Consolas, monospace; font-size:11px; }
+
 /* Sözlük bilgisi (kart) */
 .word-phonetic { font-size:12px; color:var(--text-3); margin-top:2px; }
 

@@ -17,19 +17,28 @@ def get_base_path():
         return sys._MEIPASS
     return os.path.dirname(os.path.abspath(__file__))
 
-def get_db_path():
+def get_data_dir():
+    """Kullanıcı verisinin (kelimeler, istatistikler, yedekler) klasörü.
+    - LINGUA_DATA_DIR ortam değişkeni verilmişse orası
+    - exe: %APPDATA%\\Lingua — exe taşınınca, silinince ya da Program Files'a
+      kurulunca veri kaybolmasın / yazılamaz olmasın diye exe'nin yanında değil
+    - geliştirme (python main.py): proje klasörü, gerçek veriden ayrı kalır
+    """
+    override = os.environ.get('LINGUA_DATA_DIR')
+    if override:
+        return override
     if getattr(sys, 'frozen', False):
-        return os.path.join(os.path.dirname(sys.executable), 'words.json')
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'words.json')
+        return os.path.join(os.environ.get('APPDATA') or os.path.expanduser('~'), 'Lingua')
+    return os.path.dirname(os.path.abspath(__file__))
 
-def get_stats_path():
-    if getattr(sys, 'frozen', False):
-        return os.path.join(os.path.dirname(sys.executable), 'stats.json')
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stats.json')
-
-DB_FILE    = get_db_path()
-STATS_FILE = get_stats_path()
+DATA_DIR   = get_data_dir()
+DB_FILE    = os.path.join(DATA_DIR, 'words.json')
+STATS_FILE = os.path.join(DATA_DIR, 'stats.json')
 INDEX_HTML = os.path.join(get_base_path(), 'index.html')
+
+DATA_FILES        = ('words.json', 'stats.json')
+BACKUP_EVERY_DAYS = 7
+BACKUPS_KEPT      = 8
 
 # Sözlükten gelen metin alanları (eş anlamlılar ayrıca liste olarak tutulur)
 DETAIL_FIELDS = ('phonetic', 'part_of_speech', 'definition')
@@ -82,6 +91,67 @@ def read_json_safe(path, default):
     return default
 
 
+# ── VERİ KLASÖRÜ VE YEDEKLER ─────────────────────────────────────
+def migrate_legacy_data(data_dir, legacy_dir):
+    """Eski sürümler veriyi exe'nin yanında tutuyordu. İlk açılışta yeni
+    klasöre kopyalar; eskiler silinmez, "*.tasindi" adıyla yerinde kalır.
+    Taşınan dosya adlarını döndürür."""
+    if os.path.normcase(os.path.abspath(data_dir)) == os.path.normcase(os.path.abspath(legacy_dir)):
+        return []
+    os.makedirs(data_dir, exist_ok=True)
+    moved = []
+    for name in DATA_FILES:
+        src, dst = os.path.join(legacy_dir, name), os.path.join(data_dir, name)
+        if not os.path.exists(src) or os.path.exists(dst):
+            continue
+        shutil.copy2(src, dst)
+        if os.path.exists(src + '.bak') and not os.path.exists(dst + '.bak'):
+            shutil.copy2(src + '.bak', dst + '.bak')
+        with open(src, 'rb') as a, open(dst, 'rb') as b:
+            if a.read() != b.read():
+                raise OSError(f'{name} kopyalanamadı')
+        os.replace(src, src + '.tasindi')
+        moved.append(name)
+    return moved
+
+
+def list_backups(data_dir):
+    root = os.path.join(data_dir, 'backups')
+    if not os.path.isdir(root):
+        return []
+    names = []
+    for name in os.listdir(root):
+        try:
+            datetime.date.fromisoformat(name)
+            names.append(name)
+        except ValueError:
+            pass
+    return sorted(names)
+
+
+def make_backup(data_dir, today):
+    """words.json ve stats.json'u backups/YYYY-MM-DD/ altına kopyalar,
+    en yeni BACKUPS_KEPT yedeği tutar. Yedek klasörünü döndürür."""
+    target = os.path.join(data_dir, 'backups', today.isoformat())
+    sources = [n for n in DATA_FILES if os.path.exists(os.path.join(data_dir, n))]
+    if not sources:
+        return None
+    os.makedirs(target, exist_ok=True)
+    for name in sources:
+        shutil.copy2(os.path.join(data_dir, name), os.path.join(target, name))
+    for old in list_backups(data_dir)[:-BACKUPS_KEPT]:
+        shutil.rmtree(os.path.join(data_dir, 'backups', old), ignore_errors=True)
+    return target
+
+
+def weekly_backup(data_dir, today):
+    """Son yedek BACKUP_EVERY_DAYS günden eskiyse yeni yedek alır."""
+    backups = list_backups(data_dir)
+    if backups and (today - datetime.date.fromisoformat(backups[-1])).days < BACKUP_EVERY_DAYS:
+        return None
+    return make_backup(data_dir, today)
+
+
 def locked(method):
     """pywebview API çağrılarını ayrı thread'lerde çalıştırır;
     veriye aynı anda tek çağrının dokunmasını sağlar."""
@@ -95,8 +165,36 @@ def locked(method):
 class Api:
     def __init__(self):
         self._lock = threading.RLock()
+        self._data_dir = os.path.dirname(DB_FILE)
+        os.makedirs(self._data_dir, exist_ok=True)
+        try:
+            # Yükleme dosyaları değiştirmeden (ör. SRS taşıması) önce alınır
+            weekly_backup(self._data_dir, datetime.date.today())
+        except OSError as e:
+            print(f'Otomatik yedek alınamadı: {e}')
         self._load_db()
         self._load_stats()
+
+    # ── VERİ KLASÖRÜ / YEDEKLER ─────────────────────────────────
+    @locked
+    def get_data_info(self):
+        backups = list_backups(self._data_dir)
+        return {
+            'data_dir':     self._data_dir,
+            'backup_count': len(backups),
+            'last_backup':  backups[-1] if backups else None,
+        }
+
+    @locked
+    def backup_now(self):
+        target = make_backup(self._data_dir, datetime.date.today())
+        return os.path.basename(target) if target else None
+
+    def open_data_folder(self):
+        if sys.platform == 'win32':
+            os.startfile(self._data_dir)
+            return True
+        return False
 
     # ── DB ──────────────────────────────────────────────────────
     def _load_db(self):
@@ -482,6 +580,10 @@ class Api:
 
 
 if __name__ == '__main__':
+    if getattr(sys, 'frozen', False):
+        moved = migrate_legacy_data(DATA_DIR, os.path.dirname(sys.executable))
+        if moved:
+            print(f'Veri {DATA_DIR} klasörüne taşındı: {", ".join(moved)}')
     api = Api()
     window = webview.create_window(
         'Lingua - Kelime Öğrenme',

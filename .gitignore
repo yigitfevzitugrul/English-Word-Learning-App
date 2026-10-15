@@ -11,3 +11,4 @@ __pycache__/
 /stats.json
 dist/
 build/
+/backups/
