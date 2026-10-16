@@ -41,7 +41,7 @@
                 <div class="field">
                     <label for="english">İngilizce Kelime</label>
                     <div class="input-with-action">
-                        <input type="text" id="english" placeholder="Örn: Serendipity" required>
+                        <input type="text" id="english" required>
                         <button type="button" class="btn-translate" id="speakFormBtn" title="Telaffuzu Dinle">
                             <i class="fas fa-volume-up"></i>
                         </button>
@@ -62,7 +62,7 @@
                 <div class="field">
                     <label for="translation">Türkçe Çeviri</label>
                     <div class="input-with-action">
-                        <input type="text" id="translation" placeholder="Örn: Tesadüfen bulunan mutluluk" required>
+                        <input type="text" id="translation" required>
                         <button type="button" class="btn-translate" id="autoTranslateBtn" title="Otomatik çevir">
                             <i class="fas fa-magic"></i>
                         </button>
@@ -75,7 +75,7 @@
                         İngilizce Örnek Cümle
                         <span class="optional-label">isteğe bağlı</span>
                     </label>
-                    <textarea id="example" placeholder="Finding this café was pure serendipity."></textarea>
+                    <textarea id="example"></textarea>
                     <div class="translate-suggestion" id="exampleSuggestion" style="display:none;"></div>
                 </div>
 
@@ -84,7 +84,7 @@
                         Türkçe Cümle
                         <span class="optional-label">isteğe bağlı</span>
                     </label>
-                    <textarea id="exampleTurkish" placeholder="Bu kafeyi bulmak tam bir tesadüftü."></textarea>
+                    <textarea id="exampleTurkish"></textarea>
                 </div>
 
 
@@ -94,7 +94,7 @@
                         Not
                         <span class="optional-label">isteğe bağlı</span>
                     </label>
-                    <textarea id="wordNotes" placeholder="Kelime hakkında not..."></textarea>
+                    <textarea id="wordNotes"></textarea>
                 </div>
             </div>
 
@@ -181,7 +181,7 @@
             <div class="controls">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Kelime veya çeviri ara...">
+                    <input type="text" id="searchInput">
                 </div>
                 <div class="filter-group">
                     <button class="filter-btn active" data-filter="all">Tümü</button>
@@ -281,7 +281,7 @@
                     <div id="quizTypeSrsInfo" class="quiz-srs-info"></div>
                     <form id="quizTypeForm" class="quiz-type-form" autocomplete="off">
                         <input type="text" id="quizTypeInput" class="quiz-type-input"
-                               spellcheck="false" placeholder="Cevabını yaz, Enter'a bas">
+                               spellcheck="false">
                         <button type="submit" class="quiz-btn right" id="quizTypeCheckBtn">Kontrol Et</button>
                     </form>
                     <div id="quizTypeResult" class="quiz-type-result" style="display:none;">
@@ -340,7 +340,7 @@
                 <!-- Summary cards -->
                 <div class="stats-summary-grid">
                     <div class="stats-summary-card">
-                        <div class="stats-summary-icon" style="background:rgba(79,142,247,0.15);color:var(--accent);">
+                        <div class="stats-summary-icon" style="background:rgba(var(--accent-rgb),0.15);color:var(--accent);">
                             <i class="fas fa-book"></i>
                         </div>
                         <div class="stats-summary-val" id="statTotal">0</div>
